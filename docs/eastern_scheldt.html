@@ -157,8 +157,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
-  <li><a href="#barrier-closures" id="toc-barrier-closures" class="nav-link" data-scroll-target="#barrier-closures">Barrier Closures</a>
+  <li><a href="#barrier-closures" id="toc-barrier-closures" class="nav-link active" data-scroll-target="#barrier-closures">Barrier Closures</a>
   <ul class="collapse">
   <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis">Analysis</a></li>
   <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization">Visualization</a></li>
@@ -218,8 +217,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="overview" class="level2">
-<h2 class="anchored" data-anchor-id="overview">Overview</h2>
 <p>This document provides a complete analysis workflow for the Eastern Scheldt barrier system, combining barrier closure analysis, tide gauge data processing, tidal analysis, and visualization. The analysis covers the period from 1986 to 2024 and includes:</p>
 <ol type="1">
 <li><strong>Barrier Closure Analysis</strong>: Loading and analyzing past barrier closure dates, counting closures per water year, and calculating statistics</li>
@@ -229,7 +226,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ol>
 <p>Water years run from July 1 to June 30, which is more appropriate for coastal flood analysis than calendar years.</p>
 <hr>
-</section>
 <section id="barrier-closures" class="level1">
 <h1>Barrier Closures</h1>
 <p>This section analyzes past closures of the Eastern Scheldt barrier. The analysis:</p>
@@ -269,72 +265,170 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>excel_file <span class="op">=</span> os.path.join(data_dir, <span class="st">'Eastern_Scheldt_Barrier_Past_Closures_2024.xlsx'</span>)</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_excel(excel_file, sheet_name<span class="op">=</span><span class="st">'Closures'</span>)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract closure dates from column 2 (index 1)</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract closure dates (date only) from column 2 (index 1)</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>closure_dates_col <span class="op">=</span> df.iloc[:, <span class="dv">1</span>]  <span class="co"># Column 2 (0-indexed)</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert dates: pandas.read_excel automatically converts Excel dates to datetime objects</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>OCD <span class="op">=</span> [d.to_pydatetime() <span class="cf">if</span> <span class="bu">isinstance</span>(d, pd.Timestamp) <span class="cf">else</span> d </span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>       <span class="cf">for</span> d <span class="kw">in</span> closure_dates_col <span class="cf">if</span> pd.notna(d)]</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Loaded </span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="sc">}</span><span class="ss"> closure dates"</span>)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(OCD) <span class="op">&gt;</span> <span class="dv">0</span>:</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  First closure: </span><span class="sc">{</span>OCD[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Last closure: </span><span class="sc">{</span>OCD[<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Count closures per water year (July 1 to July 1)</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>OCS <span class="op">=</span> []  <span class="co"># Will store [index, year, year+1, num_closures]</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>YT <span class="op">=</span> []   <span class="co"># Will store year labels like "1986/87"</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> co, y <span class="kw">in</span> <span class="bu">enumerate</span>(Y, start<span class="op">=</span><span class="dv">1</span>):</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Find closures between July 1 of year y and July 1 of year y+1</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    start_date <span class="op">=</span> datetime(y, <span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    end_date <span class="op">=</span> datetime(y <span class="op">+</span> <span class="dv">1</span>, <span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Count closures in this water year</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    closures_in_year <span class="op">=</span> [d <span class="cf">for</span> d <span class="kw">in</span> OCD <span class="cf">if</span> start_date <span class="op">&lt;=</span> d <span class="op">&lt;</span> end_date]</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    num_closures <span class="op">=</span> <span class="bu">len</span>(closures_in_year)</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    OCS.append([co, y, y <span class="op">+</span> <span class="dv">1</span>, num_closures])</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create year label (e.g., "1986/87")</span></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    year_str <span class="op">=</span> <span class="bu">str</span>(y <span class="op">+</span> <span class="dv">1</span>)</span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    YT.append(<span class="ss">f"</span><span class="sc">{</span>y<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>year_str[<span class="dv">2</span>:]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>OCS <span class="op">=</span> np.array(OCS)</span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Closures per water year calculated for </span><span class="sc">{</span><span class="bu">len</span>(OCS)<span class="sc">}</span><span class="ss"> years"</span>)</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Total closures: </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(OCS[:, <span class="dv">3</span>])<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Calculate statistics</span></span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>E <span class="op">=</span> np.array([</span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    np.<span class="bu">min</span>(OCS[:, <span class="dv">3</span>]),      <span class="co"># Minimum closures per year</span></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    np.mean(OCS[:, <span class="dv">3</span>]),     <span class="co"># Mean closures per year</span></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    np.<span class="bu">max</span>(OCS[:, <span class="dv">3</span>]),      <span class="co"># Maximum closures per year</span></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    np.<span class="bu">sum</span>(OCS[:, <span class="dv">3</span>])       <span class="co"># Total closures</span></span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>])</span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Closure statistics:"</span>)</span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Min per year: </span><span class="sc">{</span>E[<span class="dv">0</span>]<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Mean per year: </span><span class="sc">{</span>E[<span class="dv">1</span>]<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Max per year: </span><span class="sc">{</span>E[<span class="dv">2</span>]<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Total: </span><span class="sc">{</span>E[<span class="dv">3</span>]<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: save-master1</span></span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: true</span></span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Save data</span></span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>output_file <span class="op">=</span> os.path.join(output_dir, <span class="st">'mast1.pkl'</span>)</span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(output_file, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    pickle.dump({</span>
-<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>        <span class="st">'OCD'</span>: OCD,</span>
-<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>        <span class="st">'OCS'</span>: OCS,</span>
-<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>        <span class="st">'E'</span>: E,</span>
-<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>        <span class="st">'YT'</span>: YT</span>
-<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>    }, f)</span>
-<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Data saved to </span><span class="sc">{</span>output_file<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract closure times (should be the 'Start of closure' column)</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Let's assume the time is in column 3 (index 2). Adjust if necessary.</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> df.shape[<span class="dv">1</span>] <span class="op">&gt;</span> <span class="dv">2</span>:</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    closure_times_col <span class="op">=</span> df.iloc[:, <span class="dv">3</span>]  <span class="co"># Column 4 (Start of closure TIME/hh:mm if present)</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If there is no time column, fallback to NaT</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    closure_times_col <span class="op">=</span> [pd.NaT] <span class="op">*</span> <span class="bu">len</span>(closure_dates_col)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Closure dates: </span><span class="sc">{</span>closure_dates_col<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Closure times: </span><span class="sc">{</span>closure_times_col<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine closure date and time to make closure datetime</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>OCD <span class="op">=</span> []</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> d, t <span class="kw">in</span> <span class="bu">zip</span>(closure_dates_col, closure_times_col):</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> pd.isna(d):</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    date_val <span class="op">=</span> d.to_pydatetime() <span class="cf">if</span> <span class="bu">isinstance</span>(d, pd.Timestamp) <span class="cf">else</span> d</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> pd.isna(t):</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># t can be a time or datetime or string like "13:00"</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(t, pd.Timestamp):</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>            time_val <span class="op">=</span> t.time()</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="bu">isinstance</span>(t, <span class="bu">str</span>):</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>            <span class="cf">try</span>:</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>                time_val <span class="op">=</span> pd.to_datetime(t).time()</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>            <span class="cf">except</span> <span class="pp">Exception</span>:</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>                time_val <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="bu">hasattr</span>(t, <span class="st">'time'</span>):</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>            time_val <span class="op">=</span> t.time()</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>            time_val <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> time_val <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>            combined_dt <span class="op">=</span> datetime.combine(date_val.date(), time_val)</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>            combined_dt <span class="op">=</span> date_val</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>        combined_dt <span class="op">=</span> date_val</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    OCD.append(combined_dt)</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Loaded </span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="sc">}</span><span class="ss"> closure datetimes"</span>)</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(OCD) <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  First closure: </span><span class="sc">{</span>OCD[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Last closure: </span><span class="sc">{</span>OCD[<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Count closures per water year (July 1 to July 1)</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>OCS <span class="op">=</span> []  <span class="co"># Will store [index, year, year+1, num_closures]</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>YT <span class="op">=</span> []   <span class="co"># Will store year labels like "1986/87"</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> co, y <span class="kw">in</span> <span class="bu">enumerate</span>(Y, start<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Find closures between July 1 of year y and July 1 of year y+1</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>    start_date <span class="op">=</span> datetime(y, <span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    end_date <span class="op">=</span> datetime(y <span class="op">+</span> <span class="dv">1</span>, <span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Count closures in this water year</span></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    closures_in_year <span class="op">=</span> [d <span class="cf">for</span> d <span class="kw">in</span> OCD <span class="cf">if</span> start_date <span class="op">&lt;=</span> d <span class="op">&lt;</span> end_date]</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    num_closures <span class="op">=</span> <span class="bu">len</span>(closures_in_year)</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>    OCS.append([co, y, y <span class="op">+</span> <span class="dv">1</span>, num_closures])</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create year label (e.g., "1986/87")</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>    year_str <span class="op">=</span> <span class="bu">str</span>(y <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>    YT.append(<span class="ss">f"</span><span class="sc">{</span>y<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>year_str[<span class="dv">2</span>:]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>OCS <span class="op">=</span> np.array(OCS)</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Closures per water year calculated for </span><span class="sc">{</span><span class="bu">len</span>(OCS)<span class="sc">}</span><span class="ss"> years"</span>)</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Total closures: </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(OCS[:, <span class="dv">3</span>])<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Calculate statistics</span></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>E <span class="op">=</span> np.array([</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>    np.<span class="bu">min</span>(OCS[:, <span class="dv">3</span>]),      <span class="co"># Minimum closures per year</span></span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>    np.mean(OCS[:, <span class="dv">3</span>]),     <span class="co"># Mean closures per year</span></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>    np.<span class="bu">max</span>(OCS[:, <span class="dv">3</span>]),      <span class="co"># Maximum closures per year</span></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>    np.<span class="bu">sum</span>(OCS[:, <span class="dv">3</span>])       <span class="co"># Total closures</span></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Closure statistics:"</span>)</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Min per year: </span><span class="sc">{</span>E[<span class="dv">0</span>]<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Mean per year: </span><span class="sc">{</span>E[<span class="dv">1</span>]<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Max per year: </span><span class="sc">{</span>E[<span class="dv">2</span>]<span class="sc">:.1f}</span><span class="ss">"</span>)</span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Total: </span><span class="sc">{</span>E[<span class="dv">3</span>]<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: save-master1</span></span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: true</span></span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Save data</span></span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>output_file <span class="op">=</span> os.path.join(output_dir, <span class="st">'mast1.pkl'</span>)</span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(output_file, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>    pickle.dump({</span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>        <span class="st">'OCD'</span>: OCD,</span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a>        <span class="st">'OCS'</span>: OCS,</span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>        <span class="st">'E'</span>: E,</span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>        <span class="st">'YT'</span>: YT</span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>    }, f)</span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Data saved to </span><span class="sc">{</span>output_file<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Loaded 31 closure dates
+<pre><code>Closure dates: 0    1986-10-20
+1    1986-12-19
+2    1986-12-19
+3    1989-02-14
+4    1990-02-27
+5    1990-02-27
+6    1990-02-28
+7    1990-03-01
+8    1990-09-21
+9    1990-12-12
+10   1990-12-12
+11   1992-11-11
+12   1993-01-25
+13   1993-02-21
+14   1993-11-14
+15   1993-11-15
+16   1994-01-28
+17   1995-01-02
+18   1995-01-02
+19   1996-10-29
+20   2002-10-27
+21   2003-12-21
+22   2004-02-08
+23   2007-11-09
+24   2013-12-05
+25   2014-10-21
+26   2018-01-03
+27   2020-02-10
+28   2022-01-31
+29   2022-02-21
+30   2023-12-21
+Name: Date, dtype: datetime64[us]
+Closure times: 0                    NaT
+1                    NaT
+2                    NaT
+3    1989-02-14 05:40:00
+4    1990-02-26 23:10:00
+5    1990-02-27 13:50:00
+6    1990-02-27 23:40:00
+7    1990-03-01 00:10:00
+8    1990-09-21 12:00:00
+9    1990-12-12 05:40:00
+10   1990-12-12 20:10:00
+11   1992-11-11 13:40:00
+12   1993-01-25 15:30:00
+13   1993-02-21 08:40:00
+14   1993-11-14 11:10:00
+15   1993-11-15 00:40:00
+16   1994-01-28 10:40:00
+17   1995-01-01 21:40:00
+18   1995-01-02 14:20:00
+19   1996-10-29 11:40:00
+20   2002-10-27 14:30:00
+21   2003-12-21 08:30:00
+22   2004-02-08 13:20:00
+23   2007-11-08 22:40:00
+24   2013-12-05 22:50:00
+25   2014-10-21 22:30:00
+26   2018-01-03 12:10:00
+27   2020-02-10 11:09:00
+28   2022-01-31 10:23:00
+29   2022-02-21 04:46:00
+30                   NaT
+Name: Start of closure, dtype: datetime64[us]
+Loaded 31 closure datetimes
   First closure: 1986-10-20 00:00:00
   Last closure: 2023-12-21 00:00:00
 
@@ -472,7 +566,7 @@ Total number of closures: 31</code></pre>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>3</td>
-<td>1989-02-14 00:00</td>
+<td>1989-02-14 05:40</td>
 <td>1988/89</td>
 <td>1989</td>
 <td>February</td>
@@ -480,7 +574,7 @@ Total number of closures: 31</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
 <td>4</td>
-<td>1990-02-27 00:00</td>
+<td>1990-02-27 23:10</td>
 <td>1989/90</td>
 <td>1990</td>
 <td>February</td>
@@ -488,7 +582,7 @@ Total number of closures: 31</code></pre>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
 <td>4</td>
-<td>1990-02-27 00:00</td>
+<td>1990-02-27 13:50</td>
 <td>1989/90</td>
 <td>1990</td>
 <td>February</td>
@@ -496,7 +590,7 @@ Total number of closures: 31</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
 <td>4</td>
-<td>1990-02-28 00:00</td>
+<td>1990-02-28 23:40</td>
 <td>1989/90</td>
 <td>1990</td>
 <td>February</td>
@@ -504,7 +598,7 @@ Total number of closures: 31</code></pre>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
 <td>5</td>
-<td>1990-03-01 00:00</td>
+<td>1990-03-01 00:10</td>
 <td>1989/90</td>
 <td>1990</td>
 <td>March</td>
@@ -512,7 +606,7 @@ Total number of closures: 31</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">8</td>
 <td>6</td>
-<td>1990-09-21 00:00</td>
+<td>1990-09-21 12:00</td>
 <td>1990/91</td>
 <td>1990</td>
 <td>September</td>
@@ -520,7 +614,7 @@ Total number of closures: 31</code></pre>
 <tr class="even">
 <td data-quarto-table-cell-role="th">9</td>
 <td>7</td>
-<td>1990-12-12 00:00</td>
+<td>1990-12-12 05:40</td>
 <td>1990/91</td>
 <td>1990</td>
 <td>December</td>
@@ -528,7 +622,7 @@ Total number of closures: 31</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">10</td>
 <td>7</td>
-<td>1990-12-12 00:00</td>
+<td>1990-12-12 20:10</td>
 <td>1990/91</td>
 <td>1990</td>
 <td>December</td>
@@ -536,7 +630,7 @@ Total number of closures: 31</code></pre>
 <tr class="even">
 <td data-quarto-table-cell-role="th">11</td>
 <td>8</td>
-<td>1992-11-11 00:00</td>
+<td>1992-11-11 13:40</td>
 <td>1992/93</td>
 <td>1992</td>
 <td>November</td>
@@ -544,7 +638,7 @@ Total number of closures: 31</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">12</td>
 <td>9</td>
-<td>1993-01-25 00:00</td>
+<td>1993-01-25 15:30</td>
 <td>1992/93</td>
 <td>1993</td>
 <td>January</td>
@@ -552,7 +646,7 @@ Total number of closures: 31</code></pre>
 <tr class="even">
 <td data-quarto-table-cell-role="th">13</td>
 <td>10</td>
-<td>1993-02-21 00:00</td>
+<td>1993-02-21 08:40</td>
 <td>1992/93</td>
 <td>1993</td>
 <td>February</td>
@@ -560,7 +654,7 @@ Total number of closures: 31</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">14</td>
 <td>11</td>
-<td>1993-11-14 00:00</td>
+<td>1993-11-14 11:10</td>
 <td>1993/94</td>
 <td>1993</td>
 <td>November</td>
@@ -568,7 +662,7 @@ Total number of closures: 31</code></pre>
 <tr class="even">
 <td data-quarto-table-cell-role="th">15</td>
 <td>11</td>
-<td>1993-11-15 00:00</td>
+<td>1993-11-15 00:40</td>
 <td>1993/94</td>
 <td>1993</td>
 <td>November</td>
@@ -576,7 +670,7 @@ Total number of closures: 31</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">16</td>
 <td>12</td>
-<td>1994-01-28 00:00</td>
+<td>1994-01-28 10:40</td>
 <td>1993/94</td>
 <td>1994</td>
 <td>January</td>
@@ -584,7 +678,7 @@ Total number of closures: 31</code></pre>
 <tr class="even">
 <td data-quarto-table-cell-role="th">17</td>
 <td>13</td>
-<td>1995-01-02 00:00</td>
+<td>1995-01-02 21:40</td>
 <td>1994/95</td>
 <td>1995</td>
 <td>January</td>
@@ -592,7 +686,7 @@ Total number of closures: 31</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">18</td>
 <td>13</td>
-<td>1995-01-02 00:00</td>
+<td>1995-01-02 14:20</td>
 <td>1994/95</td>
 <td>1995</td>
 <td>January</td>
@@ -600,7 +694,7 @@ Total number of closures: 31</code></pre>
 <tr class="even">
 <td data-quarto-table-cell-role="th">19</td>
 <td>14</td>
-<td>1996-10-29 00:00</td>
+<td>1996-10-29 11:40</td>
 <td>1996/97</td>
 <td>1996</td>
 <td>October</td>
@@ -608,7 +702,7 @@ Total number of closures: 31</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">20</td>
 <td>15</td>
-<td>2002-10-27 00:00</td>
+<td>2002-10-27 14:30</td>
 <td>2002/03</td>
 <td>2002</td>
 <td>October</td>
@@ -616,7 +710,7 @@ Total number of closures: 31</code></pre>
 <tr class="even">
 <td data-quarto-table-cell-role="th">21</td>
 <td>16</td>
-<td>2003-12-21 00:00</td>
+<td>2003-12-21 08:30</td>
 <td>2003/04</td>
 <td>2003</td>
 <td>December</td>
@@ -624,7 +718,7 @@ Total number of closures: 31</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">22</td>
 <td>17</td>
-<td>2004-02-08 00:00</td>
+<td>2004-02-08 13:20</td>
 <td>2003/04</td>
 <td>2004</td>
 <td>February</td>
@@ -632,7 +726,7 @@ Total number of closures: 31</code></pre>
 <tr class="even">
 <td data-quarto-table-cell-role="th">23</td>
 <td>18</td>
-<td>2007-11-09 00:00</td>
+<td>2007-11-09 22:40</td>
 <td>2007/08</td>
 <td>2007</td>
 <td>November</td>
@@ -640,7 +734,7 @@ Total number of closures: 31</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">24</td>
 <td>19</td>
-<td>2013-12-05 00:00</td>
+<td>2013-12-05 22:50</td>
 <td>2013/14</td>
 <td>2013</td>
 <td>December</td>
@@ -648,7 +742,7 @@ Total number of closures: 31</code></pre>
 <tr class="even">
 <td data-quarto-table-cell-role="th">25</td>
 <td>20</td>
-<td>2014-10-21 00:00</td>
+<td>2014-10-21 22:30</td>
 <td>2014/15</td>
 <td>2014</td>
 <td>October</td>
@@ -656,7 +750,7 @@ Total number of closures: 31</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">26</td>
 <td>21</td>
-<td>2018-01-03 00:00</td>
+<td>2018-01-03 12:10</td>
 <td>2017/18</td>
 <td>2018</td>
 <td>January</td>
@@ -664,7 +758,7 @@ Total number of closures: 31</code></pre>
 <tr class="even">
 <td data-quarto-table-cell-role="th">27</td>
 <td>22</td>
-<td>2020-02-10 00:00</td>
+<td>2020-02-10 11:09</td>
 <td>2019/20</td>
 <td>2020</td>
 <td>February</td>
@@ -672,7 +766,7 @@ Total number of closures: 31</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">28</td>
 <td>23</td>
-<td>2022-01-31 00:00</td>
+<td>2022-01-31 10:23</td>
 <td>2021/22</td>
 <td>2022</td>
 <td>January</td>
@@ -680,7 +774,7 @@ Total number of closures: 31</code></pre>
 <tr class="even">
 <td data-quarto-table-cell-role="th">29</td>
 <td>24</td>
-<td>2022-02-21 00:00</td>
+<td>2022-02-21 04:46</td>
 <td>2021/22</td>
 <td>2022</td>
 <td>February</td>
@@ -1303,14 +1397,10 @@ Total predictions: 1,998,576 points
 <span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>fig_file <span class="op">=</span> os.path.join(output_dir, <span class="st">'master3_tidal_analysis.png'</span>)</span>
 <span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>plt.savefig(fig_file, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">'tight'</span>)</span>
 <span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Figure saved to </span><span class="sc">{</span>fig_file<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>/opt/miniconda3/envs/objective1/lib/python3.14/site-packages/IPython/core/pylabtools.py:170: UserWarning: Creating legend with loc="best" can be slow with large amounts of data.
-  fig.canvas.print_figure(bytes_io, **kw)</code></pre>
-</div>
 <div class="cell-output cell-output-display">
 <div id="plot-comparison-1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="eastern_scheldt_files/figure-html/plot-comparison-output-2.png" class="img-fluid figure-img"></p>
+<p><img src="eastern_scheldt_files/figure-html/plot-comparison-output-1.png" class="img-fluid figure-img"></p>
 <figcaption>Comparison of observed water levels (blue) and predicted astronomical tides (red) for the Eastern Scheldt, 1986-2023</figcaption>
 </figure>
 </div>
@@ -1343,19 +1433,19 @@ Figure saved to output/master3_tidal_analysis.png</code></pre>
 <section id="setup-and-configuration-1" class="level2">
 <h2 class="anchored" data-anchor-id="setup-and-configuration-1">Setup and Configuration</h2>
 <div id="setup-master4" class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pickle</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Output directory</span></span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">'output'</span></span>
-<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>os.makedirs(output_dir, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Analysis configuration:"</span>)</span>
-<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Output directory: </span><span class="sc">{</span>output_dir<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pickle</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Output directory</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">'output'</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>os.makedirs(output_dir, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Analysis configuration:"</span>)</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Output directory: </span><span class="sc">{</span>output_dir<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Analysis configuration:
   Output directory: output</code></pre>
@@ -1365,46 +1455,46 @@ Figure saved to output/master3_tidal_analysis.png</code></pre>
 <section id="load-data" class="level2">
 <h2 class="anchored" data-anchor-id="load-data">Load Data</h2>
 <div id="load-data-master4" class="cell" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load barrier closure data from master1</span></span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Loading barrier closure data..."</span>)</span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>mast1_file <span class="op">=</span> os.path.join(output_dir, <span class="st">'mast1.pkl'</span>)</span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(mast1_file):</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Required file </span><span class="sc">{</span>mast1_file<span class="sc">}</span><span class="ss"> not found. "</span></span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Please run Part 1 (Barrier Closure Analysis) first to generate the required data file."</span></span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(mast1_file, <span class="st">'rb'</span>) <span class="im">as</span> f:</span>
-<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>    data1 <span class="op">=</span> pickle.load(f)</span>
-<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>    OCD <span class="op">=</span> data1[<span class="st">'OCD'</span>]  <span class="co"># Observed closure dates</span></span>
-<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Load tide gauge and tidal prediction data from master3</span></span>
-<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Loading tide gauge and tidal prediction data..."</span>)</span>
-<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>mast3_file <span class="op">=</span> os.path.join(output_dir, <span class="st">'mast3.pkl'</span>)</span>
-<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(mast3_file):</span>
-<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
-<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Required file </span><span class="sc">{</span>mast3_file<span class="sc">}</span><span class="ss"> not found. "</span></span>
-<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Please run Part 1, Part 2, and Part 3 first to generate the required data files."</span></span>
-<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(mast3_file, <span class="st">'rb'</span>) <span class="im">as</span> f:</span>
-<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>    data3 <span class="op">=</span> pickle.load(f)</span>
-<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a>    TSP <span class="op">=</span> data3[<span class="st">'TSP'</span>]  <span class="co"># Time series for predictions</span></span>
-<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a>    TIP <span class="op">=</span> data3[<span class="st">'TIP'</span>]  <span class="co"># Predicted tides</span></span>
-<span id="cb41-25"><a href="#cb41-25" aria-hidden="true" tabindex="-1"></a>    WLP <span class="op">=</span> data3[<span class="st">'WLP'</span>]  <span class="co"># Observed water levels</span></span>
-<span id="cb41-26"><a href="#cb41-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-27"><a href="#cb41-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to numpy arrays if needed</span></span>
-<span id="cb41-28"><a href="#cb41-28" aria-hidden="true" tabindex="-1"></a>OCD <span class="op">=</span> np.array(OCD)</span>
-<span id="cb41-29"><a href="#cb41-29" aria-hidden="true" tabindex="-1"></a>TSP <span class="op">=</span> np.array(TSP)</span>
-<span id="cb41-30"><a href="#cb41-30" aria-hidden="true" tabindex="-1"></a>TIP <span class="op">=</span> np.array(TIP)</span>
-<span id="cb41-31"><a href="#cb41-31" aria-hidden="true" tabindex="-1"></a>WLP <span class="op">=</span> np.array(WLP)</span>
-<span id="cb41-32"><a href="#cb41-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-33"><a href="#cb41-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Data loaded:"</span>)</span>
-<span id="cb41-34"><a href="#cb41-34" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Closure dates: </span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="sc">}</span><span class="ss"> closures"</span>)</span>
-<span id="cb41-35"><a href="#cb41-35" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(OCD) <span class="op">&gt;</span> <span class="dv">0</span>:</span>
-<span id="cb41-36"><a href="#cb41-36" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"    First closure: </span><span class="sc">{</span>OCD[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb41-37"><a href="#cb41-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"    Last closure: </span><span class="sc">{</span>OCD[<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb41-38"><a href="#cb41-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Time series points: </span><span class="sc">{</span><span class="bu">len</span>(TSP)<span class="sc">:,}</span><span class="ss">"</span>)</span>
-<span id="cb41-39"><a href="#cb41-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Predicted tides: </span><span class="sc">{</span><span class="bu">len</span>(TIP)<span class="sc">:,}</span><span class="ss">"</span>)</span>
-<span id="cb41-40"><a href="#cb41-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Observed water levels: </span><span class="sc">{</span><span class="bu">len</span>(WLP)<span class="sc">:,}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load barrier closure data from master1</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Loading barrier closure data..."</span>)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>mast1_file <span class="op">=</span> os.path.join(output_dir, <span class="st">'mast1.pkl'</span>)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(mast1_file):</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Required file </span><span class="sc">{</span>mast1_file<span class="sc">}</span><span class="ss"> not found. "</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Please run Part 1 (Barrier Closure Analysis) first to generate the required data file."</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(mast1_file, <span class="st">'rb'</span>) <span class="im">as</span> f:</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>    data1 <span class="op">=</span> pickle.load(f)</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>    OCD <span class="op">=</span> data1[<span class="st">'OCD'</span>]  <span class="co"># Observed closure dates</span></span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Load tide gauge and tidal prediction data from master3</span></span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Loading tide gauge and tidal prediction data..."</span>)</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>mast3_file <span class="op">=</span> os.path.join(output_dir, <span class="st">'mast3.pkl'</span>)</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(mast3_file):</span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Required file </span><span class="sc">{</span>mast3_file<span class="sc">}</span><span class="ss"> not found. "</span></span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Please run Part 1, Part 2, and Part 3 first to generate the required data files."</span></span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(mast3_file, <span class="st">'rb'</span>) <span class="im">as</span> f:</span>
+<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a>    data3 <span class="op">=</span> pickle.load(f)</span>
+<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a>    TSP <span class="op">=</span> data3[<span class="st">'TSP'</span>]  <span class="co"># Time series for predictions</span></span>
+<span id="cb40-24"><a href="#cb40-24" aria-hidden="true" tabindex="-1"></a>    TIP <span class="op">=</span> data3[<span class="st">'TIP'</span>]  <span class="co"># Predicted tides</span></span>
+<span id="cb40-25"><a href="#cb40-25" aria-hidden="true" tabindex="-1"></a>    WLP <span class="op">=</span> data3[<span class="st">'WLP'</span>]  <span class="co"># Observed water levels</span></span>
+<span id="cb40-26"><a href="#cb40-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-27"><a href="#cb40-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to numpy arrays if needed</span></span>
+<span id="cb40-28"><a href="#cb40-28" aria-hidden="true" tabindex="-1"></a>OCD <span class="op">=</span> np.array(OCD)</span>
+<span id="cb40-29"><a href="#cb40-29" aria-hidden="true" tabindex="-1"></a>TSP <span class="op">=</span> np.array(TSP)</span>
+<span id="cb40-30"><a href="#cb40-30" aria-hidden="true" tabindex="-1"></a>TIP <span class="op">=</span> np.array(TIP)</span>
+<span id="cb40-31"><a href="#cb40-31" aria-hidden="true" tabindex="-1"></a>WLP <span class="op">=</span> np.array(WLP)</span>
+<span id="cb40-32"><a href="#cb40-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-33"><a href="#cb40-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Data loaded:"</span>)</span>
+<span id="cb40-34"><a href="#cb40-34" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Closure dates: </span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="sc">}</span><span class="ss"> closures"</span>)</span>
+<span id="cb40-35"><a href="#cb40-35" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(OCD) <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb40-36"><a href="#cb40-36" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"    First closure: </span><span class="sc">{</span>OCD[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb40-37"><a href="#cb40-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"    Last closure: </span><span class="sc">{</span>OCD[<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb40-38"><a href="#cb40-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Time series points: </span><span class="sc">{</span><span class="bu">len</span>(TSP)<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb40-39"><a href="#cb40-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Predicted tides: </span><span class="sc">{</span><span class="bu">len</span>(TIP)<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb40-40"><a href="#cb40-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Observed water levels: </span><span class="sc">{</span><span class="bu">len</span>(WLP)<span class="sc">:,}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Loading barrier closure data...
 Loading tide gauge and tidal prediction data...
@@ -1423,36 +1513,36 @@ Data loaded:
 <h2 class="anchored" data-anchor-id="figure---predicted-high-waters-and-closures">Figure - Predicted High Waters and Closures</h2>
 <p>This figure shows predicted astronomical tides (red), observed water levels (blue), the difference between them (green), and barrier closure dates (vertical dashed magenta lines). The difference (WLP-TIP) represents the non-tidal component, primarily storm surge.</p>
 <div id="plot-predicted-high-waters" class="cell" data-fig-height="8" data-fig-width="14" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">8</span>))</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot vertical lines for barrier closure dates</span></span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(OCD)):</span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    ax.axvline(OCD[i], color<span class="op">=</span><span class="st">'m'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, linewidth<span class="op">=</span><span class="dv">2</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot predicted tides (TIP)</span></span>
-<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>ax.plot(TSP, TIP, <span class="st">'r'</span>, linewidth<span class="op">=</span><span class="dv">1</span>, label<span class="op">=</span><span class="st">'Predicted tide (TIP)'</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
-<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot observed water levels (WLP)</span></span>
-<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>ax.plot(TSP, WLP, <span class="st">'b'</span>, linewidth<span class="op">=</span><span class="dv">1</span>, label<span class="op">=</span><span class="st">'Observed water level (WLP)'</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
-<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot difference (WLP - TIP) - surge component</span></span>
-<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>ax.plot(TSP, WLP <span class="op">-</span> TIP, <span class="st">'g'</span>, linewidth<span class="op">=</span><span class="dv">1</span>, label<span class="op">=</span><span class="st">'Surge (WLP - TIP)'</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
-<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Formatting</span></span>
-<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Date'</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
-<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Level (m)'</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
-<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="op">-</span><span class="dv">3</span>, <span class="dv">4</span>)</span>
-<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>ax.legend(fontsize<span class="op">=</span><span class="dv">14</span>, loc<span class="op">=</span><span class="st">'best'</span>)</span>
-<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>ax.tick_params(labelsize<span class="op">=</span><span class="dv">14</span>)</span>
-<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Save figure</span></span>
-<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a>fig_file <span class="op">=</span> os.path.join(output_dir, <span class="st">'master4_predicted_high_waters.png'</span>)</span>
-<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a>plt.savefig(fig_file, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">'tight'</span>)</span>
-<span id="cb43-30"><a href="#cb43-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Figure saved to </span><span class="sc">{</span>fig_file<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">8</span>))</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot vertical lines for barrier closure dates</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(OCD)):</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    ax.axvline(OCD[i], color<span class="op">=</span><span class="st">'m'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, linewidth<span class="op">=</span><span class="dv">2</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot predicted tides (TIP)</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>ax.plot(TSP, TIP, <span class="st">'r'</span>, linewidth<span class="op">=</span><span class="dv">1</span>, label<span class="op">=</span><span class="st">'Predicted tide (TIP)'</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot observed water levels (WLP)</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>ax.plot(TSP, WLP, <span class="st">'b'</span>, linewidth<span class="op">=</span><span class="dv">1</span>, label<span class="op">=</span><span class="st">'Observed water level (WLP)'</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot difference (WLP - TIP) - surge component</span></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>ax.plot(TSP, WLP <span class="op">-</span> TIP, <span class="st">'g'</span>, linewidth<span class="op">=</span><span class="dv">1</span>, label<span class="op">=</span><span class="st">'Surge (WLP - TIP)'</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Formatting</span></span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Date'</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Level (m)'</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="op">-</span><span class="dv">3</span>, <span class="dv">4</span>)</span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>ax.legend(fontsize<span class="op">=</span><span class="dv">14</span>, loc<span class="op">=</span><span class="st">'best'</span>)</span>
+<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a>ax.tick_params(labelsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb42-25"><a href="#cb42-25" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb42-26"><a href="#cb42-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-27"><a href="#cb42-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Save figure</span></span>
+<span id="cb42-28"><a href="#cb42-28" aria-hidden="true" tabindex="-1"></a>fig_file <span class="op">=</span> os.path.join(output_dir, <span class="st">'master4_predicted_high_waters.png'</span>)</span>
+<span id="cb42-29"><a href="#cb42-29" aria-hidden="true" tabindex="-1"></a>plt.savefig(fig_file, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">'tight'</span>)</span>
+<span id="cb42-30"><a href="#cb42-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Figure saved to </span><span class="sc">{</span>fig_file<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div id="plot-predicted-high-waters-1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
