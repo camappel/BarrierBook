@@ -183,7 +183,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>This document provides a detailed analysis of water levels and surge for Storm 12 (closure event index 11), Storm 23 (closure event index 23, 2007), and Storm 25 (closure event index 24) for the Eastern Scheldt, converting the MATLAB script <code>master5.m</code> to Python. The analysis:</p>
+<p>This document provides a detailed analysis of water levels and surge for Storm 12 (closure event index 11), Storm 13 (closure event index 12), Storm 23 (closure event index 23, 2007), and Storm 25 (closure event index 24) for the Eastern Scheldt, converting the MATLAB script <code>master5.m</code> to Python. The analysis:</p>
 <ol type="1">
 <li>Loads barrier closure dates and tide gauge data from previous analyses</li>
 <li>Calculates surge component (WLP - TIP)</li>
@@ -193,7 +193,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Detailed two-panel view showing water level vs.&nbsp;tide and surge separately</li>
 </ul></li>
 </ol>
-<p>This provides a comprehensive view of the water level conditions that led to the barrier closures for Storms 12, 23, and 25.</p>
+<p>This provides a comprehensive view of the water level conditions that led to the barrier closures for Storms 12, 13, 23, and 25.</p>
 <div id="setup-high-waters" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -207,11 +207,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>os.makedirs(output_dir, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Analysis configuration:"</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Storms to process: Storm 12 (e=11, prefix '12_'), Storm 23 (e=23, prefix '23_'), and Storm 25 (e=24, prefix '25_')"</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Storms to process: Storm 12 (e=11, prefix '12_'), Storm 13 (e=12, prefix '13_'), Storm 23 (e=23, prefix '23_'), and Storm 25 (e=24, prefix '25_')"</span>)</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Output directory: </span><span class="sc">{</span>output_dir<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Analysis configuration:
-  Storms to process: Storm 12 (e=11, prefix '12_'), Storm 23 (e=23, prefix '23_'), and Storm 25 (e=24, prefix '25_')
+  Storms to process: Storm 12 (e=11, prefix '12_'), Storm 13 (e=12, prefix '13_'), Storm 23 (e=23, prefix '23_'), and Storm 25 (e=24, prefix '25_')
   Output directory: output</code></pre>
 </div>
 </div>
@@ -257,14 +257,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate event indices for all storms</span></span>
 <span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>e_storm12 <span class="op">=</span> <span class="dv">11</span></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>e_storm23 <span class="op">=</span> <span class="dv">23</span></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>e_storm25 <span class="op">=</span> <span class="dv">24</span></span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> e_storm12 <span class="op">&gt;=</span> <span class="bu">len</span>(OCD):</span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f"Event index </span><span class="sc">{</span>e_storm12<span class="sc">}</span><span class="ss"> (Storm 12) is out of range. There are </span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="sc">}</span><span class="ss"> closure events (indices 0-</span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="op">-</span><span class="dv">1</span><span class="sc">}</span><span class="ss">)"</span>)</span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> e_storm23 <span class="op">&gt;=</span> <span class="bu">len</span>(OCD):</span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f"Event index </span><span class="sc">{</span>e_storm23<span class="sc">}</span><span class="ss"> (Storm 23) is out of range. There are </span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="sc">}</span><span class="ss"> closure events (indices 0-</span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="op">-</span><span class="dv">1</span><span class="sc">}</span><span class="ss">)"</span>)</span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> e_storm25 <span class="op">&gt;=</span> <span class="bu">len</span>(OCD):</span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f"Event index </span><span class="sc">{</span>e_storm25<span class="sc">}</span><span class="ss"> (Storm 25) is out of range. There are </span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="sc">}</span><span class="ss"> closure events (indices 0-</span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="op">-</span><span class="dv">1</span><span class="sc">}</span><span class="ss">)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>e_storm13 <span class="op">=</span> <span class="dv">12</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>e_storm23 <span class="op">=</span> <span class="dv">23</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>e_storm25 <span class="op">=</span> <span class="dv">24</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> e_storm12 <span class="op">&gt;=</span> <span class="bu">len</span>(OCD):</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f"Event index </span><span class="sc">{</span>e_storm12<span class="sc">}</span><span class="ss"> (Storm 12) is out of range. There are </span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="sc">}</span><span class="ss"> closure events (indices 0-</span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="op">-</span><span class="dv">1</span><span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> e_storm13 <span class="op">&gt;=</span> <span class="bu">len</span>(OCD):</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f"Event index </span><span class="sc">{</span>e_storm13<span class="sc">}</span><span class="ss"> (Storm 13) is out of range. There are </span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="sc">}</span><span class="ss"> closure events (indices 0-</span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="op">-</span><span class="dv">1</span><span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> e_storm23 <span class="op">&gt;=</span> <span class="bu">len</span>(OCD):</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f"Event index </span><span class="sc">{</span>e_storm23<span class="sc">}</span><span class="ss"> (Storm 23) is out of range. There are </span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="sc">}</span><span class="ss"> closure events (indices 0-</span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="op">-</span><span class="dv">1</span><span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> e_storm25 <span class="op">&gt;=</span> <span class="bu">len</span>(OCD):</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f"Event index </span><span class="sc">{</span>e_storm25<span class="sc">}</span><span class="ss"> (Storm 25) is out of range. There are </span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="sc">}</span><span class="ss"> closure events (indices 0-</span><span class="sc">{</span><span class="bu">len</span>(OCD)<span class="op">-</span><span class="dv">1</span><span class="sc">}</span><span class="ss">)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Loading barrier closure data...
 Loading tide gauge and tidal prediction data...
@@ -335,8 +338,8 @@ Data loaded:
 ============================================================
 Processing Storm 12 (event index 11, prefix: 12_)
 ============================================================
-  Closure date: 1992-11-11 00:00:00
-  Closure date + 1 day: 1992-11-12 00:00:00</code></pre>
+  Closure date: 1992-11-11 13:40:00
+  Closure date + 1 day: 1992-11-12 13:40:00</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div id="plot-predicted-high-waters-zoomed-storm12-1" class="quarto-figure quarto-figure-center anchored">
@@ -407,8 +410,8 @@ Processing Storm 12 (event index 11, prefix: 12_)
 ============================================================
 Processing Storm 12 (event index 11, prefix: 12_)
 ============================================================
-  Closure date: 1992-11-11 00:00:00
-  Closure date + 1 day: 1992-11-12 00:00:00</code></pre>
+  Closure date: 1992-11-11 13:40:00
+  Closure date + 1 day: 1992-11-12 13:40:00</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div id="plot-water-level-surge-storm12-1" class="quarto-figure quarto-figure-center anchored">
@@ -487,8 +490,8 @@ Processing Storm 12 (event index 11, prefix: 12_)
 ============================================================
 Processing Storm 23 (event index 23, prefix: 23_)
 ============================================================
-  Closure date: 2007-11-09 00:00:00
-  Closure date + 1 day: 2007-11-10 00:00:00</code></pre>
+  Closure date: 2007-11-09 22:40:00
+  Closure date + 1 day: 2007-11-10 22:40:00</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div id="plot-predicted-high-waters-zoomed-storm23-1" class="quarto-figure quarto-figure-center anchored">
@@ -559,8 +562,8 @@ Processing Storm 23 (event index 23, prefix: 23_)
 ============================================================
 Processing Storm 23 (event index 23, prefix: 23_)
 ============================================================
-  Closure date: 2007-11-09 00:00:00
-  Closure date + 1 day: 2007-11-10 00:00:00</code></pre>
+  Closure date: 2007-11-09 22:40:00
+  Closure date + 1 day: 2007-11-10 22:40:00</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div id="plot-water-level-surge-storm23-1" class="quarto-figure quarto-figure-center anchored">
@@ -639,8 +642,8 @@ Processing Storm 23 (event index 23, prefix: 23_)
 ============================================================
 Processing Storm 25 (event index 24, prefix: 25_)
 ============================================================
-  Closure date: 2013-12-05 00:00:00
-  Closure date + 1 day: 2013-12-06 00:00:00</code></pre>
+  Closure date: 2013-12-05 22:50:00
+  Closure date + 1 day: 2013-12-06 22:50:00</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div id="plot-predicted-high-waters-zoomed-storm25-1" class="quarto-figure quarto-figure-center anchored">
@@ -711,14 +714,12 @@ Processing Storm 25 (event index 24, prefix: 25_)
 ============================================================
 Processing Storm 25 (event index 24, prefix: 25_)
 ============================================================
-  Closure date: 2013-12-05 00:00:00
-  Closure date + 1 day: 2013-12-06 00:00:00</code></pre>
+  Closure date: 2013-12-05 22:50:00
+  Closure date + 1 day: 2013-12-06 22:50:00</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_10159/1153962993.py:42: UserWarning: Creating legend with loc="best" can be slow with large amounts of data.
-  plt.tight_layout()
-/opt/miniconda3/envs/objective1/lib/python3.14/site-packages/IPython/core/pylabtools.py:170: UserWarning: Creating legend with loc="best" can be slow with large amounts of data.
-  fig.canvas.print_figure(bytes_io, **kw)</code></pre>
+<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_13351/1153962993.py:42: UserWarning: Creating legend with loc="best" can be slow with large amounts of data.
+  plt.tight_layout()</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div id="plot-water-level-surge-storm25-1" class="quarto-figure quarto-figure-center anchored">
