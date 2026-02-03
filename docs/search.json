@@ -1,12 +1,5 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Past Closures of the Eastern Scheldt Barrier",
-    "section": "",
-    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites."
-  },
-  {
     "objectID": "master4.html",
     "href": "master4.html",
     "title": "Predicted High Waters and Barrier Closures - Eastern Scheldt",
@@ -151,21 +144,21 @@
     "href": "master6.html#figure---gtsm-surge-maps",
     "title": "Meteorological Conditions of Chosen Storm - Eastern Scheldt",
     "section": "Figure - GTSM Surge Maps",
-    "text": "Figure - GTSM Surge Maps\nThis figure shows spatial surge patterns from GTSM reanalysis at 6 time steps around the closure event, illustrating how surge developed and propagated.\n\nimport matplotlib.gridspec as gridspec\n\nfig = plt.figure(figsize=(16, 10))\ngs = gridspec.GridSpec(2, 4, width_ratios=[1, 1, 1, 0.06], wspace=0.3, hspace=0.25)\naxes = [fig.add_subplot(gs[i // 3, i % 3]) for i in range(6)]\n\nfor i, t_idx in enumerate(t_gtsm):\n    ax = axes[i]\n    scatter = ax.scatter(X_GT, Y_GT, c=SU_GT[t_idx, :], cmap='jet', s=15, vmin=-0.5, vmax=1.0)\n    ax.set_xlim(xb_gtsm)\n    ax.set_ylim(yb_gtsm)\n    ax.set_aspect('equal')\n    ax.grid(True, alpha=0.3)\n    ax.tick_params(labelsize=12)\n    ax.set_title(TS_GT[t_idx].strftime('%Y-%m-%d %H:%M'), fontweight='bold', fontsize=16)\n    if i &gt;= 3:  # Bottom row\n        ax.set_xlabel('Longitude (deg)', fontweight='bold', fontsize=14)\n    if i % 3 == 0:  # Left column\n        ax.set_ylabel('Latitude (deg)', fontweight='bold', fontsize=14)\n\n# Add vertical colorbar at far right\ncbar_ax = fig.add_subplot(gs[:, 3])\ncbar = plt.colorbar(scatter, cax=cbar_ax, orientation='vertical')\ncbar.set_label('Surge (m)', fontweight='bold', fontsize=14)\ncbar.ax.tick_params(labelsize=12)\n\nplt.tight_layout(rect=[0, 0, 0.97, 1])  # Leave space for colorbar\nplt.show()\n\n# Save figure\nfig_file = os.path.join(output_dir, 'master6_gtsm_surge.png')\nplt.savefig(fig_file, dpi=150, bbox_inches='tight')\nprint(f\"\\nFigure saved to {fig_file}\")\n\n/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_79610/560003979.py:27: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.\n  plt.tight_layout(rect=[0, 0, 0.97, 1])  # Leave space for colorbar\n\n\n\n\n\nGTSM reanalysis surge maps at 6 time steps around the closure event\n\n\n\n\n\nFigure saved to output/master6_gtsm_surge.png\n\n\n&lt;Figure size 672x480 with 0 Axes&gt;"
+    "text": "Figure - GTSM Surge Maps\nThis figure shows spatial surge patterns from GTSM reanalysis at 6 time steps around the closure event, illustrating how surge developed and propagated.\n\nimport matplotlib.gridspec as gridspec\n\nfig = plt.figure(figsize=(16, 10))\ngs = gridspec.GridSpec(2, 4, width_ratios=[1, 1, 1, 0.06], wspace=0.3, hspace=0.25)\naxes = [fig.add_subplot(gs[i // 3, i % 3]) for i in range(6)]\n\nfor i, t_idx in enumerate(t_gtsm):\n    ax = axes[i]\n    scatter = ax.scatter(X_GT, Y_GT, c=SU_GT[t_idx, :], cmap='jet', s=15, vmin=-0.5, vmax=1.0)\n    ax.set_xlim(xb_gtsm)\n    ax.set_ylim(yb_gtsm)\n    ax.set_aspect('equal')\n    ax.grid(True, alpha=0.3)\n    ax.tick_params(labelsize=12)\n    ax.set_title(TS_GT[t_idx].strftime('%Y-%m-%d %H:%M'), fontweight='bold', fontsize=16)\n    if i &gt;= 3:  # Bottom row\n        ax.set_xlabel('Longitude (deg)', fontweight='bold', fontsize=14)\n    if i % 3 == 0:  # Left column\n        ax.set_ylabel('Latitude (deg)', fontweight='bold', fontsize=14)\n\n# Add vertical colorbar at far right\ncbar_ax = fig.add_subplot(gs[:, 3])\ncbar = plt.colorbar(scatter, cax=cbar_ax, orientation='vertical')\ncbar.set_label('Surge (m)', fontweight='bold', fontsize=14)\ncbar.ax.tick_params(labelsize=12)\n\nplt.tight_layout(rect=[0, 0, 0.97, 1])  # Leave space for colorbar\nplt.show()\n\n# Save figure\nfig_file = os.path.join(output_dir, 'master6_gtsm_surge.png')\nplt.savefig(fig_file, dpi=150, bbox_inches='tight')\nprint(f\"\\nFigure saved to {fig_file}\")\n\n/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_37045/560003979.py:27: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.\n  plt.tight_layout(rect=[0, 0, 0.97, 1])  # Leave space for colorbar\n\n\n\n\n\nGTSM reanalysis surge maps at 6 time steps around the closure event\n\n\n\n\n\nFigure saved to output/master6_gtsm_surge.png\n\n\n&lt;Figure size 672x480 with 0 Axes&gt;"
   },
   {
     "objectID": "master6.html#figure---era5-meteorological-maps",
     "href": "master6.html#figure---era5-meteorological-maps",
     "title": "Meteorological Conditions of Chosen Storm - Eastern Scheldt",
     "section": "Figure - ERA5 Meteorological Maps",
-    "text": "Figure - ERA5 Meteorological Maps\nThis figure shows ERA5 reanalysis pressure fields and wind vectors at 6 time steps around the closure event, showing the meteorological conditions that drove the surge.\n\nfrom matplotlib.animation import FuncAnimation, PillowWriter\n\nint_skip = 3  # Skip every 3rd grid point for wind vectors\n\n# Create figure with single axis\nfig, ax = plt.subplots(figsize=(12, 10))\n\n# Prepare data for all time steps\nX_sub = X_MET[lon_idx[0]:lon_idx[-1]+1, lat_idx[0]:lat_idx[-1]+1]\nY_sub = Y_MET[lon_idx[0]:lon_idx[-1]+1, lat_idx[0]:lat_idx[-1]+1]\nX_vec = X_MET[lon_idx[0]:lon_idx[-1]+1:int_skip, lat_idx[0]:lat_idx[-1]+1:int_skip]\nY_vec = Y_MET[lon_idx[0]:lon_idx[-1]+1:int_skip, lat_idx[0]:lat_idx[-1]+1:int_skip]\n\n# Initialize plot with first time step\nt_idx = t_met[0]\nP_sub = P_MET[lon_idx[0]:lon_idx[-1]+1, lat_idx[0]:lat_idx[-1]+1, t_idx] / 100\nU_vec = U_MET[lon_idx[0]:lon_idx[-1]+1:int_skip, lat_idx[0]:lat_idx[-1]+1:int_skip, t_idx]\nV_vec = V_MET[lon_idx[0]:lon_idx[-1]+1:int_skip, lat_idx[0]:lat_idx[-1]+1:int_skip, t_idx]\n\nim = ax.pcolormesh(X_sub, Y_sub, P_sub, cmap='jet', shading='gouraud', vmin=967, vmax=1020)\nqv = ax.quiver(X_vec, Y_vec, U_vec, V_vec, color='k', scale=300, width=0.002)\n\nax.set_xlim(xb_met)\nax.set_ylim(yb_met)\nax.set_aspect('equal')\nax.grid(True, alpha=0.3)\nax.tick_params(labelsize=12)\nax.set_xlabel('Longitude (deg)', fontweight='bold', fontsize=14)\nax.set_ylabel('Latitude (deg)', fontweight='bold', fontsize=14)\n\n# Add colorbar\ncbar = plt.colorbar(im, ax=ax, orientation='vertical', pad=0.02)\ncbar.set_label('Pressure (hPa)', fontweight='bold', fontsize=14)\ncbar.ax.tick_params(labelsize=12)\n\ntitle_text = ax.set_title(TS_MET[t_idx].strftime('%Y-%m-%d %H:%M'), fontweight='bold', fontsize=16)\n\n# Animation function\ndef animate(frame):\n    t_idx = t_met[frame]\n    P_sub = P_MET[lon_idx[0]:lon_idx[-1]+1, lat_idx[0]:lat_idx[-1]+1, t_idx] / 100\n    U_vec = U_MET[lon_idx[0]:lon_idx[-1]+1:int_skip, lat_idx[0]:lat_idx[-1]+1:int_skip, t_idx]\n    V_vec = V_MET[lon_idx[0]:lon_idx[-1]+1:int_skip, lat_idx[0]:lat_idx[-1]+1:int_skip, t_idx]\n    \n    # Update pcolormesh\n    im.set_array(P_sub.ravel())\n    \n    # Update quiver\n    qv.set_UVC(U_vec, V_vec)\n    \n    # Update title\n    title_text.set_text(TS_MET[t_idx].strftime('%Y-%m-%d %H:%M'))\n    \n    return im, qv, title_text\n\n# Create animation\nanim = FuncAnimation(fig, animate, frames=len(t_met), interval=800, blit=False, repeat=True)\n\nplt.tight_layout()\nplt.show()\n\n# Save as GIF\ngif_file = os.path.join(output_dir, 'master6_era5_meteorology.gif')\nwriter = PillowWriter(fps=1.25)  # 1.25 fps = 0.8 seconds per frame\nanim.save(gif_file, writer=writer, dpi=150)\nprint(f\"\\nGIF saved to {gif_file}\")\n\n\n\n\nERA5 reanalysis pressure and wind fields animated through time steps\n\n\n\n\n\nGIF saved to output/master6_era5_meteorology.gif"
+    "text": "Figure - ERA5 Meteorological Maps\nThis figure shows ERA5 reanalysis pressure fields and wind vectors at 6 time steps around the closure event, showing the meteorological conditions that drove the surge.\n\nimport matplotlib.gridspec as gridspec\n\nint_skip = 3  # Skip every 3rd grid point for wind vectors\n\n# Prepare data for all time steps\nX_sub = X_MET[lon_idx[0]:lon_idx[-1]+1, lat_idx[0]:lat_idx[-1]+1]\nY_sub = Y_MET[lon_idx[0]:lon_idx[-1]+1, lat_idx[0]:lat_idx[-1]+1]\nX_vec = X_MET[lon_idx[0]:lon_idx[-1]+1:int_skip, lat_idx[0]:lat_idx[-1]+1:int_skip]\nY_vec = Y_MET[lon_idx[0]:lon_idx[-1]+1:int_skip, lat_idx[0]:lat_idx[-1]+1:int_skip]\n\n# Create figure with 2x3 grid + colorbar\nfig = plt.figure(figsize=(16, 10))\ngs = gridspec.GridSpec(2, 4, width_ratios=[1, 1, 1, 0.06], wspace=0.3, hspace=0.25)\naxes = [fig.add_subplot(gs[i // 3, i % 3]) for i in range(6)]\n\n# Plot each time step\nims = []\nfor i, t_idx in enumerate(t_met):\n    ax = axes[i]\n    \n    # Get data for this time step\n    P_sub = P_MET[lon_idx[0]:lon_idx[-1]+1, lat_idx[0]:lat_idx[-1]+1, t_idx] / 100\n    U_vec = U_MET[lon_idx[0]:lon_idx[-1]+1:int_skip, lat_idx[0]:lat_idx[-1]+1:int_skip, t_idx]\n    V_vec = V_MET[lon_idx[0]:lon_idx[-1]+1:int_skip, lat_idx[0]:lat_idx[-1]+1:int_skip, t_idx]\n    \n    # Plot pressure field\n    im = ax.pcolormesh(X_sub, Y_sub, P_sub, cmap='jet', shading='gouraud', vmin=967, vmax=1020)\n    ims.append(im)\n    \n    # Plot wind vectors\n    ax.quiver(X_vec, Y_vec, U_vec, V_vec, color='k', scale=300, width=0.002)\n    \n    # Formatting\n    ax.set_xlim(xb_met)\n    ax.set_ylim(yb_met)\n    ax.set_aspect('equal')\n    ax.grid(True, alpha=0.3)\n    ax.tick_params(labelsize=12)\n    ax.set_title(TS_MET[t_idx].strftime('%Y-%m-%d %H:%M'), fontweight='bold', fontsize=16)\n    \n    if i &gt;= 3:  # Bottom row\n        ax.set_xlabel('Longitude (deg)', fontweight='bold', fontsize=14)\n    if i % 3 == 0:  # Left column\n        ax.set_ylabel('Latitude (deg)', fontweight='bold', fontsize=14)\n\n# Add vertical colorbar at far right\ncbar_ax = fig.add_subplot(gs[:, 3])\ncbar = plt.colorbar(ims[0], cax=cbar_ax, orientation='vertical')\ncbar.set_label('Pressure (hPa)', fontweight='bold', fontsize=14)\ncbar.ax.tick_params(labelsize=12)\n\nplt.tight_layout(rect=[0, 0, 0.97, 1])  # Leave space for colorbar\nplt.show()\n\n# Save figure\nfig_file = os.path.join(output_dir, 'master6_era5_meteorology.png')\nplt.savefig(fig_file, dpi=150, bbox_inches='tight')\nprint(f\"\\nFigure saved to {fig_file}\")\n\n/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_37045/1701159121.py:52: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.\n  plt.tight_layout(rect=[0, 0, 0.97, 1])  # Leave space for colorbar\n\n\n\n\n\nERA5 reanalysis pressure and wind fields at 6 time steps around the closure event\n\n\n\n\n\nFigure saved to output/master6_era5_meteorology.png\n\n\n&lt;Figure size 672x480 with 0 Axes&gt;"
   },
   {
     "objectID": "master6.html#summary",
     "href": "master6.html#summary",
     "title": "Meteorological Conditions of Chosen Storm - Eastern Scheldt",
     "section": "Summary",
-    "text": "Summary\nThis comprehensive analysis provides detailed insight into the meteorological conditions of a chosen storm event:\n\nWater level context: Shows how observed water levels, predicted tides, and surge evolved around the closure event\nSpatial surge patterns: GTSM reanalysis shows how surge developed and propagated spatially at 3-hour intervals\nMeteorological forcing: ERA5 reanalysis shows the pressure patterns and wind fields that drove the surge as an animated GIF cycling through 12-hour intervals\nTemporal evolution: The 6 time steps capture the development, peak, and decay of the storm system\n\nThis multi-faceted view helps understand the physical processes that led to the barrier closure, from large-scale meteorological forcing to local surge development."
+    "text": "Summary\nThis comprehensive analysis provides detailed insight into the meteorological conditions of a chosen storm event:\n\nWater level context: Shows how observed water levels, predicted tides, and surge evolved around the closure event\nSpatial surge patterns: GTSM reanalysis shows how surge developed and propagated spatially at 6-hour intervals\nMeteorological forcing: ERA5 reanalysis shows the pressure patterns and wind fields that drove the surge at 6 time steps displayed in a faceted layout\nTemporal evolution: The 6 time steps capture the development, peak, and decay of the storm system\n\nThis multi-faceted view helps understand the physical processes that led to the barrier closure, from large-scale meteorological forcing to local surge development."
   },
   {
     "objectID": "master3.html",
@@ -238,6 +231,55 @@
     "text": "Part 3: Tidal Analysis\n\nData quality: Calculated for each year to determine suitable reference years\nHarmonic analysis: Performed using pytides (Python equivalent of MATLAB’s t_tide)\nPredictions: Generated at 10-minute intervals for the entire period\nSurge calculation: The difference between observed and predicted water levels represents the non-tidal component (surge)\n\nThe complete workflow provides a foundation for understanding barrier closure patterns, water level variability, and storm surge dynamics in the Eastern Scheldt estuary. The results can be used for further analysis of individual closure events, surge characteristics, and long-term trends."
   },
   {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Past Closures of the Eastern Scheldt Barrier",
+    "section": "",
+    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites."
+  },
+  {
+    "objectID": "eastern_scheldt.html",
+    "href": "eastern_scheldt.html",
+    "title": "Eastern Scheldt Barrier Closures (1986-2024)",
+    "section": "",
+    "text": "This section analyzes past closures of the Eastern Scheldt Barrier. The analysis:\n\nLoads barrier closure dates from an Excel file\nCounts closures per water year (July 1 to July 1)\nCalculates statistics (min, mean, max, total closures)\nCreates a bar chart visualization\n\nWater years run from July 1 to June 30, which is more appropriate for coastal flood analysis than calendar years."
+  },
+  {
+    "objectID": "eastern_scheldt.html#overview",
+    "href": "eastern_scheldt.html#overview",
+    "title": "Eastern Scheldt Barrier Closures (1986-2024)",
+    "section": "",
+    "text": "This section analyzes past closures of the Eastern Scheldt Barrier. The analysis:\n\nLoads barrier closure dates from an Excel file\nCounts closures per water year (July 1 to July 1)\nCalculates statistics (min, mean, max, total closures)\nCreates a bar chart visualization\n\nWater years run from July 1 to June 30, which is more appropriate for coastal flood analysis than calendar years."
+  },
+  {
+    "objectID": "eastern_scheldt.html#setup-and-configuration",
+    "href": "eastern_scheldt.html#setup-and-configuration",
+    "title": "Eastern Scheldt Barrier Closures (1986-2024)",
+    "section": "Setup and Configuration",
+    "text": "Setup and Configuration\n\nimport pandas as pd\nimport numpy as np\nimport pickle\nimport matplotlib.pyplot as plt\nfrom datetime import datetime\nimport os\n\n# Configuration - years from 1986 to 2024\nY = list(range(1986, 2025))  # [1986, 1987, ..., 2024]\n\n# Output directory\noutput_dir = 'output'\nos.makedirs(output_dir, exist_ok=True)\n\nprint(f\"Analysis configuration:\")\nprint(f\"  Water years: {Y[0]}/{str(Y[0]+1)[2:]} to {Y[-1]}/{str(Y[-1]+1)[2:]} ({len(Y)} years)\")\n\nAnalysis configuration:\n  Water years: 1986/87 to 2024/25 (39 years)"
+  },
+  {
+    "objectID": "eastern_scheldt.html#load-barrier-closure-data",
+    "href": "eastern_scheldt.html#load-barrier-closure-data",
+    "title": "Eastern Scheldt Barrier Closures (1986-2024)",
+    "section": "Load Barrier Closure Data",
+    "text": "Load Barrier Closure Data\n\n# 1. Observed closure data - Eastern Scheldt\ndata_dir = '../2_DATA/1_BARRIER_CLOSURES'\nexcel_file = os.path.join(data_dir, 'Eastern_Scheldt_Barrier_Past_Closures_2024.xlsx')\ndf = pd.read_excel(excel_file, sheet_name='Closures')\n\n# Extract closure dates from column 2 (index 1)\nclosure_dates_col = df.iloc[:, 1]  # Column 2 (0-indexed)\n\n# Convert dates: pandas.read_excel automatically converts Excel dates to datetime objects\nOCD = [d.to_pydatetime() if isinstance(d, pd.Timestamp) else d \n       for d in closure_dates_col if pd.notna(d)]\n\nprint(f\"Loaded {len(OCD)} closure dates\")\nif len(OCD) &gt; 0:\n    print(f\"  First closure: {OCD[0]}\")\n    print(f\"  Last closure: {OCD[-1]}\")\n\nLoaded 31 closure dates\n  First closure: 1986-10-20 00:00:00\n  Last closure: 2023-12-21 00:00:00"
+  },
+  {
+    "objectID": "eastern_scheldt.html#count-closures-per-water-year",
+    "href": "eastern_scheldt.html#count-closures-per-water-year",
+    "title": "Eastern Scheldt Barrier Closures (1986-2024)",
+    "section": "Count Closures Per Water Year",
+    "text": "Count Closures Per Water Year\n\n# 2. Count closures per water year (July 1 to July 1)\nOCS = []  # Will store [index, year, year+1, num_closures]\nYT = []   # Will store year labels like \"1986/87\"\n\nfor co in range(len(OCD)):\n    # Find closures between July 1 of year y and July 1 of year y+1\n    start_date = datetime(OCD[co].year, 7, 1, 0, 0, 0)\n    end_date = datetime(OCD[co].year + 1, 7, 1, 0, 0, 0)\n    \n    # Count closures in this water year\n    closures_in_year = [d for d in OCD if start_date &lt;= d &lt; end_date]\n    num_closures = len(closures_in_year)\n    \n    OCS.append([co, OCD[co].year, OCD[co].year + 1, num_closures])\n    \n    # Create year label (e.g., \"1986/87\")\n    year_str = str(OCD[co].year + 1)\n    YT.append(f\"{OCD[co].year}/{year_str[2:]}\")\n\nOCS = np.array(OCS)\n\nprint(f\"\\nClosures per water year calculated for {len(OCS)} years\")\nprint(f\"  Total closures: {np.sum(OCS[:, 3])}\")\n\n\nClosures per water year calculated for 31 years\n  Total closures: 59"
+  },
+  {
+    "objectID": "eastern_scheldt.html#calculate-statistics",
+    "href": "eastern_scheldt.html#calculate-statistics",
+    "title": "Eastern Scheldt Barrier Closures (1986-2024)",
+    "section": "Calculate Statistics",
+    "text": "Calculate Statistics"
+  },
+  {
     "objectID": "master1_thames.html",
     "href": "master1_thames.html",
     "title": "Thames Barrier Closure Analysis",
@@ -292,48 +334,6 @@
     "title": "Thames Barrier Closure Analysis",
     "section": "Visualization (Part 1)",
     "text": "Visualization (Part 1)\nThis bar chart shows the number of barrier closures per water year from 1986/87 to 2024/25. The Thames Barrier closes when water levels exceed a threshold, typically during storm surge events.\n\nfig, ax = plt.subplots(figsize=(12, 6))\nax.bar(OCS[:, 0], OCS[:, 3], color='black')\nax.set_xlim(0.2, len(OCS) + 0.8)\nax.set_xticks(range(1, len(OCS) + 1))\nax.set_xticklabels(YT, rotation=90)\n# Note: y-axis limit may need adjustment based on actual data\nmax_closures = int(np.max(OCS[:, 3])) + 1\nax.set_ylim(0, max_closures)\nax.set_yticks(range(0, max_closures + 1, max(1, max_closures // 10)))\nax.set_ylabel('Number of closures', fontweight='bold', fontsize=18)\nax.set_title('Thames Barrier', fontweight='bold', fontsize=18)\nax.grid(True, alpha=0.3)\nax.tick_params(labelsize=16)\n\nplt.tight_layout()\nplt.show()\n\n# Save figure\nfig_file = os.path.join(output_dir, 'master1_thames_closures.png')\nplt.savefig(fig_file, dpi=150, bbox_inches='tight')\nprint(f\"\\nFigure saved to {fig_file}\")\n\n\n\n\nNumber of Thames Barrier closures per water year (July 1 to June 30), 1986-2024\n\n\n\n\n\nFigure saved to output/master1_thames_closures.png\n\n\n&lt;Figure size 672x480 with 0 Axes&gt;"
-  },
-  {
-    "objectID": "eastern_scheldt.html",
-    "href": "eastern_scheldt.html",
-    "title": "Eastern Scheldt Barrier Closures (1986-2024)",
-    "section": "",
-    "text": "This section analyzes past closures of the Eastern Scheldt Barrier. The analysis:\n\nLoads barrier closure dates from an Excel file\nCounts closures per water year (July 1 to July 1)\nCalculates statistics (min, mean, max, total closures)\nCreates a bar chart visualization\n\nWater years run from July 1 to June 30, which is more appropriate for coastal flood analysis than calendar years."
-  },
-  {
-    "objectID": "eastern_scheldt.html#overview",
-    "href": "eastern_scheldt.html#overview",
-    "title": "Eastern Scheldt Barrier Closures (1986-2024)",
-    "section": "",
-    "text": "This section analyzes past closures of the Eastern Scheldt Barrier. The analysis:\n\nLoads barrier closure dates from an Excel file\nCounts closures per water year (July 1 to July 1)\nCalculates statistics (min, mean, max, total closures)\nCreates a bar chart visualization\n\nWater years run from July 1 to June 30, which is more appropriate for coastal flood analysis than calendar years."
-  },
-  {
-    "objectID": "eastern_scheldt.html#setup-and-configuration",
-    "href": "eastern_scheldt.html#setup-and-configuration",
-    "title": "Eastern Scheldt Barrier Closures (1986-2024)",
-    "section": "Setup and Configuration",
-    "text": "Setup and Configuration\n\nimport pandas as pd\nimport numpy as np\nimport pickle\nimport matplotlib.pyplot as plt\nfrom datetime import datetime\nimport os\n\n# Configuration - years from 1986 to 2024\nY = list(range(1986, 2025))  # [1986, 1987, ..., 2024]\n\n# Output directory\noutput_dir = 'output'\nos.makedirs(output_dir, exist_ok=True)\n\nprint(f\"Analysis configuration:\")\nprint(f\"  Water years: {Y[0]}/{str(Y[0]+1)[2:]} to {Y[-1]}/{str(Y[-1]+1)[2:]} ({len(Y)} years)\")\n\nAnalysis configuration:\n  Water years: 1986/87 to 2024/25 (39 years)"
-  },
-  {
-    "objectID": "eastern_scheldt.html#load-barrier-closure-data",
-    "href": "eastern_scheldt.html#load-barrier-closure-data",
-    "title": "Eastern Scheldt Barrier Closures (1986-2024)",
-    "section": "Load Barrier Closure Data",
-    "text": "Load Barrier Closure Data\n\n# 1. Observed closure data - Eastern Scheldt\ndata_dir = '../2_DATA/1_BARRIER_CLOSURES'\nexcel_file = os.path.join(data_dir, 'Eastern_Scheldt_Barrier_Past_Closures_2024.xlsx')\ndf = pd.read_excel(excel_file, sheet_name='Closures')\n\n# Extract closure dates from column 2 (index 1)\nclosure_dates_col = df.iloc[:, 1]  # Column 2 (0-indexed)\n\n# Convert dates: pandas.read_excel automatically converts Excel dates to datetime objects\nOCD = [d.to_pydatetime() if isinstance(d, pd.Timestamp) else d \n       for d in closure_dates_col if pd.notna(d)]\n\nprint(f\"Loaded {len(OCD)} closure dates\")\nif len(OCD) &gt; 0:\n    print(f\"  First closure: {OCD[0]}\")\n    print(f\"  Last closure: {OCD[-1]}\")\n\nLoaded 31 closure dates\n  First closure: 1986-10-20 00:00:00\n  Last closure: 2023-12-21 00:00:00"
-  },
-  {
-    "objectID": "eastern_scheldt.html#count-closures-per-water-year",
-    "href": "eastern_scheldt.html#count-closures-per-water-year",
-    "title": "Eastern Scheldt Barrier Closures (1986-2024)",
-    "section": "Count Closures Per Water Year",
-    "text": "Count Closures Per Water Year\n\n# 2. Count closures per water year (July 1 to July 1)\nOCS = []  # Will store [index, year, year+1, num_closures]\nYT = []   # Will store year labels like \"1986/87\"\n\nfor co in range(len(OCD)):\n    # Find closures between July 1 of year y and July 1 of year y+1\n    start_date = datetime(OCD[co].year, 7, 1, 0, 0, 0)\n    end_date = datetime(OCD[co].year + 1, 7, 1, 0, 0, 0)\n    \n    # Count closures in this water year\n    closures_in_year = [d for d in OCD if start_date &lt;= d &lt; end_date]\n    num_closures = len(closures_in_year)\n    \n    OCS.append([co, OCD[co].year, OCD[co].year + 1, num_closures])\n    \n    # Create year label (e.g., \"1986/87\")\n    year_str = str(OCD[co].year + 1)\n    YT.append(f\"{OCD[co].year}/{year_str[2:]}\")\n\nOCS = np.array(OCS)\n\nprint(f\"\\nClosures per water year calculated for {len(OCS)} years\")\nprint(f\"  Total closures: {np.sum(OCS[:, 3])}\")\n\n\nClosures per water year calculated for 31 years\n  Total closures: 59"
-  },
-  {
-    "objectID": "eastern_scheldt.html#calculate-statistics",
-    "href": "eastern_scheldt.html#calculate-statistics",
-    "title": "Eastern Scheldt Barrier Closures (1986-2024)",
-    "section": "Calculate Statistics",
-    "text": "Calculate Statistics"
   },
   {
     "objectID": "master1.html",

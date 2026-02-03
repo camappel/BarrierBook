@@ -589,7 +589,7 @@ Figure saved to output/master6_water_level_surge.png</code></pre>
 <span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>plt.savefig(fig_file, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">'tight'</span>)</span>
 <span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Figure saved to </span><span class="sc">{</span>fig_file<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_79610/560003979.py:27: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_37045/560003979.py:27: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout(rect=[0, 0, 0.97, 1])  # Leave space for colorbar</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -612,84 +612,83 @@ Figure saved to output/master6_gtsm_surge.png</code></pre>
 <section id="figure---era5-meteorological-maps" class="level2">
 <h2 class="anchored" data-anchor-id="figure---era5-meteorological-maps">Figure - ERA5 Meteorological Maps</h2>
 <p>This figure shows ERA5 reanalysis pressure fields and wind vectors at 6 time steps around the closure event, showing the meteorological conditions that drove the surge.</p>
-<div id="cell-plot-era5-met" class="cell" data-dev="gif" data-ffmpeg-format="gif" data-fig-height="10" data-fig-show="hold" data-fig-width="12" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.animation <span class="im">import</span> FuncAnimation, PillowWriter</span>
+<div id="plot-era5-met" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.gridspec <span class="im">as</span> gridspec</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>int_skip <span class="op">=</span> <span class="dv">3</span>  <span class="co"># Skip every 3rd grid point for wind vectors</span></span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create figure with single axis</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">10</span>))</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare data for all time steps</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>X_sub <span class="op">=</span> X_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>]</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>Y_sub <span class="op">=</span> Y_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>]</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>X_vec <span class="op">=</span> X_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip]</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>Y_vec <span class="op">=</span> Y_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip]</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize plot with first time step</span></span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>t_idx <span class="op">=</span> t_met[<span class="dv">0</span>]</span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>P_sub <span class="op">=</span> P_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>, t_idx] <span class="op">/</span> <span class="dv">100</span></span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>U_vec <span class="op">=</span> U_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip, t_idx]</span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>V_vec <span class="op">=</span> V_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip, t_idx]</span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>im <span class="op">=</span> ax.pcolormesh(X_sub, Y_sub, P_sub, cmap<span class="op">=</span><span class="st">'jet'</span>, shading<span class="op">=</span><span class="st">'gouraud'</span>, vmin<span class="op">=</span><span class="dv">967</span>, vmax<span class="op">=</span><span class="dv">1020</span>)</span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>qv <span class="op">=</span> ax.quiver(X_vec, Y_vec, U_vec, V_vec, color<span class="op">=</span><span class="st">'k'</span>, scale<span class="op">=</span><span class="dv">300</span>, width<span class="op">=</span><span class="fl">0.002</span>)</span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(xb_met)</span>
-<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(yb_met)</span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>ax.set_aspect(<span class="st">'equal'</span>)</span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>ax.tick_params(labelsize<span class="op">=</span><span class="dv">12</span>)</span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Longitude (deg)'</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
-<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Latitude (deg)'</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Add colorbar</span></span>
-<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>cbar <span class="op">=</span> plt.colorbar(im, ax<span class="op">=</span>ax, orientation<span class="op">=</span><span class="st">'vertical'</span>, pad<span class="op">=</span><span class="fl">0.02</span>)</span>
-<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>cbar.set_label(<span class="st">'Pressure (hPa)'</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
-<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>cbar.ax.tick_params(labelsize<span class="op">=</span><span class="dv">12</span>)</span>
-<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>title_text <span class="op">=</span> ax.set_title(TS_MET[t_idx].strftime(<span class="st">'%Y-%m-</span><span class="sc">%d</span><span class="st"> %H:%M'</span>), fontweight<span class="op">=</span><span class="st">'bold'</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
-<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Animation function</span></span>
-<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> animate(frame):</span>
-<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>    t_idx <span class="op">=</span> t_met[frame]</span>
-<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>    P_sub <span class="op">=</span> P_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>, t_idx] <span class="op">/</span> <span class="dv">100</span></span>
-<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>    U_vec <span class="op">=</span> U_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip, t_idx]</span>
-<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>    V_vec <span class="op">=</span> V_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip, t_idx]</span>
-<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Update pcolormesh</span></span>
-<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>    im.set_array(P_sub.ravel())</span>
-<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Update quiver</span></span>
-<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>    qv.set_UVC(U_vec, V_vec)</span>
-<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Update title</span></span>
-<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a>    title_text.set_text(TS_MET[t_idx].strftime(<span class="st">'%Y-%m-</span><span class="sc">%d</span><span class="st"> %H:%M'</span>))</span>
-<span id="cb18-53"><a href="#cb18-53" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb18-54"><a href="#cb18-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> im, qv, title_text</span>
-<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-56"><a href="#cb18-56" aria-hidden="true" tabindex="-1"></a><span class="co"># Create animation</span></span>
-<span id="cb18-57"><a href="#cb18-57" aria-hidden="true" tabindex="-1"></a>anim <span class="op">=</span> FuncAnimation(fig, animate, frames<span class="op">=</span><span class="bu">len</span>(t_met), interval<span class="op">=</span><span class="dv">800</span>, blit<span class="op">=</span><span class="va">False</span>, repeat<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb18-58"><a href="#cb18-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-59"><a href="#cb18-59" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb18-60"><a href="#cb18-60" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb18-61"><a href="#cb18-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-62"><a href="#cb18-62" aria-hidden="true" tabindex="-1"></a><span class="co"># Save as GIF</span></span>
-<span id="cb18-63"><a href="#cb18-63" aria-hidden="true" tabindex="-1"></a>gif_file <span class="op">=</span> os.path.join(output_dir, <span class="st">'master6_era5_meteorology.gif'</span>)</span>
-<span id="cb18-64"><a href="#cb18-64" aria-hidden="true" tabindex="-1"></a>writer <span class="op">=</span> PillowWriter(fps<span class="op">=</span><span class="fl">1.25</span>)  <span class="co"># 1.25 fps = 0.8 seconds per frame</span></span>
-<span id="cb18-65"><a href="#cb18-65" aria-hidden="true" tabindex="-1"></a>anim.save(gif_file, writer<span class="op">=</span>writer, dpi<span class="op">=</span><span class="dv">150</span>)</span>
-<span id="cb18-66"><a href="#cb18-66" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">GIF saved to </span><span class="sc">{</span>gif_file<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare data for all time steps</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>X_sub <span class="op">=</span> X_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>]</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>Y_sub <span class="op">=</span> Y_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>]</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>X_vec <span class="op">=</span> X_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip]</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>Y_vec <span class="op">=</span> Y_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip]</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Create figure with 2x3 grid + colorbar</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="dv">10</span>))</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>gs <span class="op">=</span> gridspec.GridSpec(<span class="dv">2</span>, <span class="dv">4</span>, width_ratios<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="fl">0.06</span>], wspace<span class="op">=</span><span class="fl">0.3</span>, hspace<span class="op">=</span><span class="fl">0.25</span>)</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>axes <span class="op">=</span> [fig.add_subplot(gs[i <span class="op">//</span> <span class="dv">3</span>, i <span class="op">%</span> <span class="dv">3</span>]) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">6</span>)]</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot each time step</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>ims <span class="op">=</span> []</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, t_idx <span class="kw">in</span> <span class="bu">enumerate</span>(t_met):</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    ax <span class="op">=</span> axes[i]</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get data for this time step</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>    P_sub <span class="op">=</span> P_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>, t_idx] <span class="op">/</span> <span class="dv">100</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>    U_vec <span class="op">=</span> U_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip, t_idx]</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>    V_vec <span class="op">=</span> V_MET[lon_idx[<span class="dv">0</span>]:lon_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip, lat_idx[<span class="dv">0</span>]:lat_idx[<span class="op">-</span><span class="dv">1</span>]<span class="op">+</span><span class="dv">1</span>:int_skip, t_idx]</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Plot pressure field</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>    im <span class="op">=</span> ax.pcolormesh(X_sub, Y_sub, P_sub, cmap<span class="op">=</span><span class="st">'jet'</span>, shading<span class="op">=</span><span class="st">'gouraud'</span>, vmin<span class="op">=</span><span class="dv">967</span>, vmax<span class="op">=</span><span class="dv">1020</span>)</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>    ims.append(im)</span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Plot wind vectors</span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>    ax.quiver(X_vec, Y_vec, U_vec, V_vec, color<span class="op">=</span><span class="st">'k'</span>, scale<span class="op">=</span><span class="dv">300</span>, width<span class="op">=</span><span class="fl">0.002</span>)</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Formatting</span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>    ax.set_xlim(xb_met)</span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>    ax.set_ylim(yb_met)</span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>    ax.set_aspect(<span class="st">'equal'</span>)</span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>    ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>    ax.tick_params(labelsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>    ax.set_title(TS_MET[t_idx].strftime(<span class="st">'%Y-%m-</span><span class="sc">%d</span><span class="st"> %H:%M'</span>), fontweight<span class="op">=</span><span class="st">'bold'</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> i <span class="op">&gt;=</span> <span class="dv">3</span>:  <span class="co"># Bottom row</span></span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>        ax.set_xlabel(<span class="st">'Longitude (deg)'</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> i <span class="op">%</span> <span class="dv">3</span> <span class="op">==</span> <span class="dv">0</span>:  <span class="co"># Left column</span></span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>        ax.set_ylabel(<span class="st">'Latitude (deg)'</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Add vertical colorbar at far right</span></span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>cbar_ax <span class="op">=</span> fig.add_subplot(gs[:, <span class="dv">3</span>])</span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>cbar <span class="op">=</span> plt.colorbar(ims[<span class="dv">0</span>], cax<span class="op">=</span>cbar_ax, orientation<span class="op">=</span><span class="st">'vertical'</span>)</span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>cbar.set_label(<span class="st">'Pressure (hPa)'</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>cbar.ax.tick_params(labelsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a>plt.tight_layout(rect<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">0</span>, <span class="fl">0.97</span>, <span class="dv">1</span>])  <span class="co"># Leave space for colorbar</span></span>
+<span id="cb18-53"><a href="#cb18-53" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb18-54"><a href="#cb18-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a><span class="co"># Save figure</span></span>
+<span id="cb18-56"><a href="#cb18-56" aria-hidden="true" tabindex="-1"></a>fig_file <span class="op">=</span> os.path.join(output_dir, <span class="st">'master6_era5_meteorology.png'</span>)</span>
+<span id="cb18-57"><a href="#cb18-57" aria-hidden="true" tabindex="-1"></a>plt.savefig(fig_file, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">'tight'</span>)</span>
+<span id="cb18-58"><a href="#cb18-58" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Figure saved to </span><span class="sc">{</span>fig_file<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_37045/1701159121.py:52: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+  plt.tight_layout(rect=[0, 0, 0.97, 1])  # Leave space for colorbar</code></pre>
+</div>
 <div class="cell-output cell-output-display">
-<div id="plot-era5-met" class="quarto-figure quarto-figure-center anchored">
+<div id="plot-era5-met-1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="master6_files/figure-html/plot-era5-met-output-1.png" class="img-fluid figure-img"></p>
-<figcaption>ERA5 reanalysis pressure and wind fields animated through time steps</figcaption>
+<p><img src="master6_files/figure-html/plot-era5-met-output-2.png" class="img-fluid figure-img"></p>
+<figcaption>ERA5 reanalysis pressure and wind fields at 6 time steps around the closure event</figcaption>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-GIF saved to output/master6_era5_meteorology.gif</code></pre>
+Figure saved to output/master6_era5_meteorology.png</code></pre>
+</div>
+<div id="plot-era5-met-2" class="cell-output cell-output-display">
+<pre><code>&lt;Figure size 672x480 with 0 Axes&gt;</code></pre>
 </div>
 </div>
 <hr>
@@ -699,8 +698,8 @@ GIF saved to output/master6_era5_meteorology.gif</code></pre>
 <p>This comprehensive analysis provides detailed insight into the meteorological conditions of a chosen storm event:</p>
 <ul>
 <li><strong>Water level context</strong>: Shows how observed water levels, predicted tides, and surge evolved around the closure event</li>
-<li><strong>Spatial surge patterns</strong>: GTSM reanalysis shows how surge developed and propagated spatially at 3-hour intervals</li>
-<li><strong>Meteorological forcing</strong>: ERA5 reanalysis shows the pressure patterns and wind fields that drove the surge as an animated GIF cycling through 12-hour intervals</li>
+<li><strong>Spatial surge patterns</strong>: GTSM reanalysis shows how surge developed and propagated spatially at 6-hour intervals</li>
+<li><strong>Meteorological forcing</strong>: ERA5 reanalysis shows the pressure patterns and wind fields that drove the surge at 6 time steps displayed in a faceted layout</li>
 <li><strong>Temporal evolution</strong>: The 6 time steps capture the development, peak, and decay of the storm system</li>
 </ul>
 <p>This multi-faceted view helps understand the physical processes that led to the barrier closure, from large-scale meteorological forcing to local surge development.</p>
