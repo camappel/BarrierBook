@@ -135,7 +135,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./high_waters.html"> 
-<span class="menu-text">High Waters Analysis</span></a>
+<span class="menu-text">Storm Surge and Tidal Harmonic Analysis</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./maps.html"> 
@@ -582,14 +582,16 @@ Total number of closures: 221</code></pre>
 <h1>Part 2: Tide Gauge Data Processing</h1>
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>This section loads and processes raw tide gauge data from the Thames. The analysis:</p>
+<p>This section loads and processes raw tide gauge data from the Thames estuary. The analysis uses the <strong>Sheerness tide gauge</strong> data from the GESLA4 (Global Extreme Sea Level Analysis) dataset, which is located near the Thames Barrier at coordinates 51.445639°N, 0.743361°E. The Sheerness gauge provides high-quality data from the British Oceanographic Data Centre (BODC) covering the period from 1952 to 2025.</p>
+<p>The analysis:</p>
 <ol type="1">
-<li>Loads data from multiple tide gauge files</li>
-<li>Cleans data by removing invalid values</li>
-<li>Combines time series from different gauges to create a continuous record</li>
+<li>Loads data from the GESLA4 format file (<code>sheerness-she-gbr-bodc</code>)</li>
+<li>Parses the GESLA4 format (Date, Time, Sea level, QC flag, Use flag)</li>
+<li>Filters data to the analysis period (1986-2023) and quality-controlled values</li>
+<li>Interpolates the data to 10-minute intervals to match the analysis requirements</li>
 <li>Creates a visualization of the complete water level time series</li>
 </ol>
-<p>The combined time series spans from 1986 to 2023, using available gauge data for the period.</p>
+<p>The GESLA4 format uses Admiralty Chart Datum (ACD) as the vertical reference. The data is provided at 15-minute intervals in the original file, which is interpolated to 10-minute intervals for consistency with the Eastern Scheldt analysis workflow. Missing values are indicated by -99.9999 in the GESLA4 format and are filtered out during processing.</p>
 </section>
 <section id="setup-and-configuration-1" class="level2">
 <h2 class="anchored" data-anchor-id="setup-and-configuration-1">Setup and Configuration</h2>
@@ -603,65 +605,123 @@ Total number of closures: 221</code></pre>
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Configuration</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>data_dir <span class="op">=</span> <span class="st">'../2_DATA/2_TIDE_GAUGE/TB'</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">'output'</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Create output directory if it doesn't exist</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>os.makedirs(output_dir, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Data directory: </span><span class="sc">{</span>data_dir<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Output directory: </span><span class="sc">{</span>output_dir<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Use GESLA4 data from RTides directory</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>gesla_dir <span class="op">=</span> <span class="st">'../../RTides/data/GESLA4_ALL'</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>data_dir <span class="op">=</span> <span class="st">'../2_DATA/2_TIDE_GAUGE/TB'</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> <span class="st">'output'</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Create output directory if it doesn't exist</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>os.makedirs(output_dir, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"GESLA4 data directory: </span><span class="sc">{</span>gesla_dir<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Output directory: </span><span class="sc">{</span>output_dir<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Data directory: ../2_DATA/2_TIDE_GAUGE/TB
+<pre><code>GESLA4 data directory: ../../RTides/data/GESLA4_ALL
 Output directory: output</code></pre>
 </div>
 </div>
 </section>
 <section id="load-tide-gauge-data" class="level2">
 <h2 class="anchored" data-anchor-id="load-tide-gauge-data">Load Tide Gauge Data</h2>
-<p>Load the tide gauge dataset. Adjust file names and date ranges based on available Thames data files.</p>
+<p>This section loads the Sheerness tide gauge data from the GESLA4 dataset. The GESLA4 format is a standardized global sea level dataset that includes quality control flags and metadata. The Sheerness gauge is located on the Isle of Sheppey in the Thames estuary, approximately 50 km downstream from the Thames Barrier, making it an appropriate reference for barrier closure analysis.</p>
+<p>The data loading process: - Reads the GESLA4 file format, skipping header lines (starting with <code>#</code>) - Parses date/time strings and converts them to datetime objects - Extracts sea level values (in meters) and quality control flags - Filters to only include data with <code>use_flag == 1</code> (recommended for analysis) - Removes missing values (indicated by -99.9999) - Filters to the analysis period (1986-2023) - Interpolates from the original 15-minute intervals to 10-minute intervals using nearest-neighbor interpolation with a 15-minute tolerance</p>
+<p>The resulting time series provides continuous water level data at 10-minute intervals for the entire analysis period.</p>
 <div id="load-tide-gauge-thames" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load tide gauge data for Thames</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: Adjust file names and date ranges based on available data files</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># This is a template structure - update with actual Thames data file names</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Example structure (update with actual file names):</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># file_in = os.path.join(data_dir, 'THAMES_1986_2023.dat')</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># D = np.loadtxt(file_in)</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Create time series: January 1, 1986 to December 31, 2023, 10-minute intervals</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>start_date <span class="op">=</span> datetime(<span class="dv">1986</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>end_date <span class="op">=</span> datetime(<span class="dv">2023</span>, <span class="dv">12</span>, <span class="dv">31</span>, <span class="dv">23</span>, <span class="dv">50</span>, <span class="dv">0</span>)</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>TSP <span class="op">=</span> pd.date_range(start<span class="op">=</span>start_date, end<span class="op">=</span>end_date, freq<span class="op">=</span><span class="st">'10min'</span>).to_pydatetime()</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Placeholder for water level data - update with actual data loading</span></span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract water level data from column 3 (index 2) if using .dat format</span></span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co"># D = np.loadtxt(file_in)</span></span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="co"># WLP = D[:, 2]</span></span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="co"># For now, create placeholder array (replace with actual data loading)</span></span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>WLP <span class="op">=</span> np.full(<span class="bu">len</span>(TSP), np.nan)</span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove default values (adjust based on actual data format)</span></span>
-<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Common patterns: 9999 indicates missing, or values outside [-500, 500]</span></span>
-<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a><span class="co"># WLP[WLP == 9999] = np.nan</span></span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a><span class="co"># WLP[(WLP &lt; -500) | (WLP &gt; 500)] = np.nan</span></span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to meters (from cm) if needed</span></span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a><span class="co"># WLP = WLP / 100.0</span></span>
-<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Loaded Thames tide gauge: </span><span class="sc">{</span><span class="bu">len</span>(TSP)<span class="sc">:,}</span><span class="ss"> data points"</span>)</span>
-<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Start: </span><span class="sc">{</span>TSP[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  End: </span><span class="sc">{</span>TSP[<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Valid data: </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(<span class="op">~</span>np.isnan(WLP))<span class="sc">:,}</span><span class="ss"> points (</span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>np<span class="sc">.</span><span class="bu">sum</span>(<span class="op">~</span>np.isnan(WLP))<span class="op">/</span><span class="bu">len</span>(WLP)<span class="sc">:.1f}</span><span class="ss">%)"</span>)</span>
-<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Note: Update this section with actual Thames tide gauge data file names and loading code"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load GESLA4 format tide gauge data for Thames (Sheerness gauge)</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>file_in <span class="op">=</span> os.path.join(gesla_dir, <span class="st">'sheerness-she-gbr-bodc'</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(file_in):</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Required file </span><span class="sc">{</span>file_in<span class="sc">}</span><span class="ss"> not found. "</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Please ensure the GESLA4 data file exists."</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Read GESLA4 file</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Format: Date (yyyy/mm/dd), Time (hh:mm:ss), Sea level (m), QC flag, Use flag</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Missing values are -99.9999</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>data_lines <span class="op">=</span> []</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(file_in, <span class="st">'r'</span>) <span class="im">as</span> f:</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> line <span class="kw">in</span> f:</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Skip header lines (start with #)</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> line.startswith(<span class="st">'#'</span>):</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Skip empty lines</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> line.strip():</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>            data_lines.append(line.strip().split())</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse data</span></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>dates <span class="op">=</span> []</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>times <span class="op">=</span> []</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>water_levels <span class="op">=</span> []</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>use_flags <span class="op">=</span> []</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> line <span class="kw">in</span> data_lines:</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(line) <span class="op">&gt;=</span> <span class="dv">5</span>:</span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>        date_str <span class="op">=</span> line[<span class="dv">0</span>]  <span class="co"># yyyy/mm/dd</span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>        time_str <span class="op">=</span> line[<span class="dv">1</span>]  <span class="co"># hh:mm:ss</span></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>        wl_str <span class="op">=</span> line[<span class="dv">2</span>]    <span class="co"># sea level (m)</span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>        qc_flag <span class="op">=</span> line[<span class="dv">3</span>]  <span class="co"># QC flag</span></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>        use_flag <span class="op">=</span> line[<span class="dv">4</span>] <span class="co"># use flag</span></span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Parse datetime</span></span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>        dt_str <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>date_str<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>time_str<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>        dt <span class="op">=</span> datetime.strptime(dt_str, <span class="st">'%Y/%m/</span><span class="sc">%d</span><span class="st"> %H:%M:%S'</span>)</span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>        dates.append(dt)</span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Parse water level</span></span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>            wl <span class="op">=</span> <span class="bu">float</span>(wl_str)</span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Check for missing values (-99.9999)</span></span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> wl <span class="op">==</span> <span class="op">-</span><span class="fl">99.9999</span> <span class="kw">or</span> <span class="bu">abs</span>(wl) <span class="op">&gt;</span> <span class="dv">100</span>:  <span class="co"># Also filter unrealistic values</span></span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>                wl <span class="op">=</span> np.nan</span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>            wl <span class="op">=</span> np.nan</span>
+<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a>        water_levels.append(wl)</span>
+<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a>        use_flags.append(<span class="bu">int</span>(use_flag))</span>
+<span id="cb18-53"><a href="#cb18-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-54"><a href="#cb18-54" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to numpy arrays</span></span>
+<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a>dates <span class="op">=</span> np.array(dates)</span>
+<span id="cb18-56"><a href="#cb18-56" aria-hidden="true" tabindex="-1"></a>water_levels <span class="op">=</span> np.array(water_levels)</span>
+<span id="cb18-57"><a href="#cb18-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-58"><a href="#cb18-58" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter to use only data with use_flag == 1</span></span>
+<span id="cb18-59"><a href="#cb18-59" aria-hidden="true" tabindex="-1"></a>use_mask <span class="op">=</span> np.array(use_flags) <span class="op">==</span> <span class="dv">1</span></span>
+<span id="cb18-60"><a href="#cb18-60" aria-hidden="true" tabindex="-1"></a>dates_clean <span class="op">=</span> dates[use_mask]</span>
+<span id="cb18-61"><a href="#cb18-61" aria-hidden="true" tabindex="-1"></a>water_levels_clean <span class="op">=</span> water_levels[use_mask]</span>
+<span id="cb18-62"><a href="#cb18-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-63"><a href="#cb18-63" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter to analysis period: 1986-2023</span></span>
+<span id="cb18-64"><a href="#cb18-64" aria-hidden="true" tabindex="-1"></a>start_date <span class="op">=</span> datetime(<span class="dv">1986</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb18-65"><a href="#cb18-65" aria-hidden="true" tabindex="-1"></a>end_date <span class="op">=</span> datetime(<span class="dv">2023</span>, <span class="dv">12</span>, <span class="dv">31</span>, <span class="dv">23</span>, <span class="dv">59</span>, <span class="dv">59</span>)</span>
+<span id="cb18-66"><a href="#cb18-66" aria-hidden="true" tabindex="-1"></a>mask_period <span class="op">=</span> (dates_clean <span class="op">&gt;=</span> start_date) <span class="op">&amp;</span> (dates_clean <span class="op">&lt;=</span> end_date)</span>
+<span id="cb18-67"><a href="#cb18-67" aria-hidden="true" tabindex="-1"></a>dates_period <span class="op">=</span> dates_clean[mask_period]</span>
+<span id="cb18-68"><a href="#cb18-68" aria-hidden="true" tabindex="-1"></a>water_levels_period <span class="op">=</span> water_levels_clean[mask_period]</span>
+<span id="cb18-69"><a href="#cb18-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-70"><a href="#cb18-70" aria-hidden="true" tabindex="-1"></a><span class="co"># Create 10-minute interval time series for the period</span></span>
+<span id="cb18-71"><a href="#cb18-71" aria-hidden="true" tabindex="-1"></a>TSP <span class="op">=</span> pd.date_range(start<span class="op">=</span>start_date, end<span class="op">=</span>end_date, freq<span class="op">=</span><span class="st">'10min'</span>).to_pydatetime()</span>
+<span id="cb18-72"><a href="#cb18-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-73"><a href="#cb18-73" aria-hidden="true" tabindex="-1"></a><span class="co"># Interpolate water levels to 10-minute intervals using pandas</span></span>
+<span id="cb18-74"><a href="#cb18-74" aria-hidden="true" tabindex="-1"></a><span class="co"># Create Series with original timestamps</span></span>
+<span id="cb18-75"><a href="#cb18-75" aria-hidden="true" tabindex="-1"></a>wl_series <span class="op">=</span> pd.Series(water_levels_period, index<span class="op">=</span>pd.DatetimeIndex(dates_period))</span>
+<span id="cb18-76"><a href="#cb18-76" aria-hidden="true" tabindex="-1"></a><span class="co"># Reindex to 10-minute intervals and interpolate</span></span>
+<span id="cb18-77"><a href="#cb18-77" aria-hidden="true" tabindex="-1"></a>wl_series_10min <span class="op">=</span> wl_series.reindex(pd.DatetimeIndex(TSP), method<span class="op">=</span><span class="st">'nearest'</span>, </span>
+<span id="cb18-78"><a href="#cb18-78" aria-hidden="true" tabindex="-1"></a>                                     tolerance<span class="op">=</span>pd.Timedelta(minutes<span class="op">=</span><span class="dv">15</span>))</span>
+<span id="cb18-79"><a href="#cb18-79" aria-hidden="true" tabindex="-1"></a>WLP <span class="op">=</span> wl_series_10min.values</span>
+<span id="cb18-80"><a href="#cb18-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-81"><a href="#cb18-81" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Loaded Sheerness tide gauge (GESLA4):"</span>)</span>
+<span id="cb18-82"><a href="#cb18-82" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Original data points: </span><span class="sc">{</span><span class="bu">len</span>(dates)<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb18-83"><a href="#cb18-83" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Data in period 1986-2023: </span><span class="sc">{</span><span class="bu">len</span>(dates_period)<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb18-84"><a href="#cb18-84" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Interpolated to 10-minute intervals: </span><span class="sc">{</span><span class="bu">len</span>(TSP)<span class="sc">:,}</span><span class="ss"> points"</span>)</span>
+<span id="cb18-85"><a href="#cb18-85" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Start: </span><span class="sc">{</span>TSP[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-86"><a href="#cb18-86" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  End: </span><span class="sc">{</span>TSP[<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-87"><a href="#cb18-87" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Valid data: </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(<span class="op">~</span>np.isnan(WLP))<span class="sc">:,}</span><span class="ss"> points (</span><span class="sc">{</span><span class="dv">100</span><span class="op">*</span>np<span class="sc">.</span><span class="bu">sum</span>(<span class="op">~</span>np.isnan(WLP))<span class="op">/</span><span class="bu">len</span>(WLP)<span class="sc">:.1f}</span><span class="ss">%)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Loaded Thames tide gauge: 1,998,576 data points
+<pre><code>Loaded Sheerness tide gauge (GESLA4):
+  Original data points: 1,364,472
+  Data in period 1986-2023: 688,664
+  Interpolated to 10-minute intervals: 1,998,576 points
   Start: 1986-01-01 00:00:00
   End: 2023-12-31 23:50:00
-  Valid data: 0 points (0.0%)
-
-Note: Update this section with actual Thames tide gauge data file names and loading code</code></pre>
+  Valid data: 1,124,886 points (56.3%)</code></pre>
 </div>
 </div>
 </section>
@@ -794,7 +854,7 @@ Figure saved to output/master2_thames_tide_gauge.png</code></pre>
 Loaded 1,998,576 data points
   Start: 1986-01-01 00:00:00
   End: 2023-12-31 23:50:00
-  Valid data: 0 points (0.0%)</code></pre>
+  Valid data: 1,124,886 points (56.3%)</code></pre>
 </div>
 </div>
 </section>
@@ -834,9 +894,9 @@ Loaded 1,998,576 data points
 Calculating data quality per year...
 
 Data quality summary:
-  Range: 0.0% to 0.0%
-  Mean: 0.0%
-  Years with quality &gt;= 60%: 0/38</code></pre>
+  Range: 0.0% to 100.0%
+  Mean: 56.3%
+  Years with quality &gt;= 60%: 17/38</code></pre>
 </div>
 </div>
 </section>
@@ -941,83 +1001,123 @@ Data quality summary:
 <pre><code>
 Performing tidal analysis and prediction...
   Processing year 1986 (1/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 52,704 points from reference year 1993
+    Predicted 52,560 points for year 1986
   Processing year 1987 (2/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 52,704 points from reference year 1993
+    Predicted 52,560 points for year 1987
   Processing year 1988 (3/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 52,704 points from reference year 1993
+    Predicted 52,704 points for year 1988
   Processing year 1989 (4/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 52,704 points from reference year 1993
+    Predicted 52,560 points for year 1989
   Processing year 1990 (5/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 52,704 points from reference year 1993
+    Predicted 52,560 points for year 1990
   Processing year 1991 (6/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 52,704 points from reference year 1993
+    Predicted 52,560 points for year 1991
   Processing year 1992 (7/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 52,704 points from reference year 1993
+    Predicted 52,704 points for year 1992
   Processing year 1993 (8/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 52,704 points from reference year 1993
+    Predicted 52,560 points for year 1993
   Processing year 1994 (9/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 52,297 points from reference year 1994
+    Predicted 52,560 points for year 1994
   Processing year 1995 (10/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 52,704 points from reference year 1995
+    Predicted 52,560 points for year 1995
   Processing year 1996 (11/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 51,828 points from reference year 1996
+    Predicted 52,704 points for year 1996
   Processing year 1997 (12/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 51,974 points from reference year 1997
+    Predicted 52,560 points for year 1997
   Processing year 1998 (13/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 52,704 points from reference year 1998
+    Predicted 52,560 points for year 1998
   Processing year 1999 (14/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 51,878 points from reference year 1999
+    Predicted 52,560 points for year 1999
   Processing year 2000 (15/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 49,732 points from reference year 2000
+    Predicted 52,704 points for year 2000
   Processing year 2001 (16/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 40,906 points from reference year 2001
+    Predicted 52,560 points for year 2001
   Processing year 2002 (17/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 37,410 points from reference year 2002
+    Predicted 52,560 points for year 2002
   Processing year 2003 (18/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 52,625 points from reference year 2003
+    Predicted 52,560 points for year 2003
   Processing year 2004 (19/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 52,848 points from reference year 2004
+    Predicted 52,704 points for year 2004
   Processing year 2005 (20/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 52,704 points from reference year 2005
+    Predicted 52,560 points for year 2005
   Processing year 2006 (21/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 52,249 points from reference year 2006
+    Predicted 52,560 points for year 2006
   Processing year 2007 (22/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 39,679 points from reference year 2007
+    Predicted 52,560 points for year 2007
   Processing year 2008 (23/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 33,152 points from reference year 2008
+    Predicted 52,704 points for year 2008
   Processing year 2009 (24/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 33,152 points from reference year 2008
+    Predicted 52,560 points for year 2009
   Processing year 2010 (25/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 33,152 points from reference year 2008
+    Predicted 52,560 points for year 2010
   Processing year 2011 (26/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 33,152 points from reference year 2008
+    Predicted 52,560 points for year 2011
   Processing year 2012 (27/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 33,152 points from reference year 2008
+    Predicted 52,704 points for year 2012
   Processing year 2013 (28/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 33,152 points from reference year 2008
+    Predicted 52,560 points for year 2013
   Processing year 2014 (29/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 33,152 points from reference year 2008
+    Predicted 52,560 points for year 2014
   Processing year 2015 (30/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 33,152 points from reference year 2008
+    Predicted 52,560 points for year 2015
   Processing year 2016 (31/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 47,468 points from reference year 2022
+    Predicted 52,704 points for year 2016
   Processing year 2017 (32/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 47,468 points from reference year 2022
+    Predicted 52,560 points for year 2017
   Processing year 2018 (33/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 47,468 points from reference year 2022
+    Predicted 52,560 points for year 2018
   Processing year 2019 (34/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 47,468 points from reference year 2022
+    Predicted 52,560 points for year 2019
   Processing year 2020 (35/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 47,468 points from reference year 2022
+    Predicted 52,704 points for year 2020
   Processing year 2021 (36/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 47,468 points from reference year 2022
+    Predicted 52,560 points for year 2021
   Processing year 2022 (37/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 47,468 points from reference year 2022
+    Predicted 52,560 points for year 2022
   Processing year 2023 (38/38)...
-    Warning: Insufficient data for reference year 1986 (0 points)
+    Analyzed 47,468 points from reference year 2022
+    Predicted 52,560 points for year 2023
 
-Total predictions: 0 points</code></pre>
+Total predictions: 1,998,576 points
+  Start: 1986-01-01 00:00:00
+  End: 2023-12-31 23:50:00</code></pre>
 </div>
 </div>
 </section>
@@ -1172,8 +1272,8 @@ Data loaded:
     First closure: 1983-02-01 00:00:00
     Last closure: 2024-04-09 00:00:00
   Time series points (observed): 1,998,576
-  Time series points (predictions): 0
-  Predicted tides: 0
+  Time series points (predictions): 1,998,576
+  Predicted tides: 1,998,576
   Observed water levels: 1,998,576</code></pre>
 </div>
 </div>
@@ -1233,13 +1333,10 @@ Data loaded:
 <span id="cb42-49"><a href="#cb42-49" aria-hidden="true" tabindex="-1"></a>fig_file <span class="op">=</span> os.path.join(output_dir, <span class="st">'master4_thames_predicted_high_waters.png'</span>)</span>
 <span id="cb42-50"><a href="#cb42-50" aria-hidden="true" tabindex="-1"></a>plt.savefig(fig_file, dpi<span class="op">=</span><span class="dv">150</span>, bbox_inches<span class="op">=</span><span class="st">'tight'</span>)</span>
 <span id="cb42-51"><a href="#cb42-51" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Figure saved to </span><span class="sc">{</span>fig_file<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Warning: No tidal predictions available. Plotting only observed water levels.</code></pre>
-</div>
 <div class="cell-output cell-output-display">
 <div id="plot-predicted-high-waters-thames-1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="thames_files/figure-html/plot-predicted-high-waters-thames-output-2.png" class="img-fluid figure-img"></p>
+<p><img src="thames_files/figure-html/plot-predicted-high-waters-thames-output-1.png" class="img-fluid figure-img"></p>
 <figcaption>Predicted high waters, observed water levels, and barrier closures for the Thames</figcaption>
 </figure>
 </div>

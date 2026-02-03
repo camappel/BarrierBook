@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>High Waters Analysis – Objective1</title>
+<title>Storm Surge and Tidal Harmonic Analysis – Objective1</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -132,7 +132,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
   <li class="nav-item">
     <a class="nav-link active" href="./high_waters.html" aria-current="page"> 
-<span class="menu-text">High Waters Analysis</span></a>
+<span class="menu-text">Storm Surge and Tidal Harmonic Analysis</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./maps.html"> 
@@ -157,11 +157,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
   <li><a href="#setup-and-configuration" id="toc-setup-and-configuration" class="nav-link" data-scroll-target="#setup-and-configuration">Setup and Configuration</a></li>
   <li><a href="#load-barrier-closure-and-tide-data" id="toc-load-barrier-closure-and-tide-data" class="nav-link" data-scroll-target="#load-barrier-closure-and-tide-data">Load Barrier Closure and Tide Data</a></li>
-  <li><a href="#storm-12-analysis" id="toc-storm-12-analysis" class="nav-link" data-scroll-target="#storm-12-analysis">Storm 12 Analysis</a>
-  <ul class="collapse">
-  <li><a href="#storm-12---predicted-high-waters-zoomed-to-closure-event" id="toc-storm-12---predicted-high-waters-zoomed-to-closure-event" class="nav-link" data-scroll-target="#storm-12---predicted-high-waters-zoomed-to-closure-event">Storm 12 - Predicted High Waters (Zoomed to Closure Event)</a></li>
-  <li><a href="#storm-12---water-level-and-surge-detailed-view" id="toc-storm-12---water-level-and-surge-detailed-view" class="nav-link" data-scroll-target="#storm-12---water-level-and-surge-detailed-view">Storm 12 - Water Level and Surge (Detailed View)</a></li>
-  </ul></li>
+  <li><a href="#storm-12-analysis" id="toc-storm-12-analysis" class="nav-link" data-scroll-target="#storm-12-analysis">Storm 12 Analysis</a></li>
   <li><a href="#storm-25-analysis" id="toc-storm-25-analysis" class="nav-link" data-scroll-target="#storm-25-analysis">Storm 25 Analysis</a></li>
   <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
   </ul>
@@ -172,7 +168,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">High Waters Analysis</h1>
+<h1 class="title">Storm Surge and Tidal Harmonic Analysis</h1>
 </div>
 
 
@@ -289,8 +285,6 @@ Data loaded:
 <section id="storm-12-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="storm-12-analysis">Storm 12 Analysis</h2>
 <p>Storm 12 corresponds to closure event index 11 (0-indexed) and uses datasets with prefix “12_” in the 2_DATA directory.</p>
-<section id="storm-12---predicted-high-waters-zoomed-to-closure-event" class="level3">
-<h3 class="anchored" data-anchor-id="storm-12---predicted-high-waters-zoomed-to-closure-event">Storm 12 - Predicted High Waters (Zoomed to Closure Event)</h3>
 <p>This figure shows a zoomed view (5-day window: 2 days before to 3 days after the closure) of predicted astronomical tides (red), observed water levels (blue), the difference between them (green), and the closure date plus one day (vertical dashed magenta lines). The difference (WLP-TIP) represents the non-tidal component, primarily storm surge.</p>
 <div id="plot-predicted-high-waters-zoomed-storm12" class="cell" data-fig-height="8" data-fig-width="14" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Storm 12 configuration</span></span>
@@ -368,9 +362,6 @@ Processing Storm 12 (event index 11, prefix: 12_)
 <pre><code>&lt;Figure size 672x480 with 0 Axes&gt;</code></pre>
 </div>
 </div>
-</section>
-<section id="storm-12---water-level-and-surge-detailed-view" class="level3">
-<h3 class="anchored" data-anchor-id="storm-12---water-level-and-surge-detailed-view">Storm 12 - Water Level and Surge (Detailed View)</h3>
 <p>This figure shows water level and surge time series zoomed to the closure event, providing context for the meteorological conditions.</p>
 <div id="plot-water-level-surge-storm12" class="cell" data-fig-height="10" data-fig-width="14" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Storm 12 configuration</span></span>
@@ -444,7 +435,6 @@ Processing Storm 12 (event index 11, prefix: 12_)
 <pre><code>&lt;Figure size 672x480 with 0 Axes&gt;</code></pre>
 </div>
 </div>
-</section>
 </section>
 <section id="storm-25-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="storm-25-analysis">Storm 25 Analysis</h2>
@@ -584,10 +574,14 @@ Processing Storm 25 (event index 24, prefix: 25_)
   Closure date: 2013-12-05 00:00:00
   Closure date + 1 day: 2013-12-06 00:00:00</code></pre>
 </div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/opt/miniconda3/envs/objective1/lib/python3.14/site-packages/IPython/core/pylabtools.py:170: UserWarning: Creating legend with loc="best" can be slow with large amounts of data.
+  fig.canvas.print_figure(bytes_io, **kw)</code></pre>
+</div>
 <div class="cell-output cell-output-display">
 <div id="plot-water-level-surge-storm25-1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="high_waters_files/figure-html/plot-water-level-surge-storm25-output-2.png" class="img-fluid figure-img"></p>
+<p><img src="high_waters_files/figure-html/plot-water-level-surge-storm25-output-3.png" class="img-fluid figure-img"></p>
 <figcaption>Water level and surge time series for Storm 25 closure event</figcaption>
 </figure>
 </div>
