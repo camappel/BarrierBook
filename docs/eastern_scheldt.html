@@ -133,14 +133,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="./thames.html"> 
 <span class="menu-text">Thames Barrier</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./high_waters.html"> 
-<span class="menu-text">Tidal Harmonic Analysis</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./maps.html"> 
-<span class="menu-text">Spatial Surge and Meteorological Maps</span></a>
-  </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -935,7 +927,7 @@ Data loaded:
 <span id="cb30-38"><a href="#cb30-38" aria-hidden="true" tabindex="-1"></a>imageio.mimsave(gif_file_gtsm, frames, duration<span class="op">=</span><span class="fl">1.2</span>)</span>
 <span id="cb30-39"><a href="#cb30-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"GTSM surge GIF saved to </span><span class="sc">{</span>gif_file_gtsm<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_70472/3380865741.py:32: DeprecationWarning: Starting with ImageIO v3 the behavior of this function will switch to that of iio.v3.imread. To keep the current behavior (and make this warning disappear) use `import imageio.v2 as imageio` or call `imageio.v2.imread` directly.
+<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_73935/3380865741.py:32: DeprecationWarning: Starting with ImageIO v3 the behavior of this function will switch to that of iio.v3.imread. To keep the current behavior (and make this warning disappear) use `import imageio.v2 as imageio` or call `imageio.v2.imread` directly.
   img = imageio.imread(buf)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -946,8 +938,8 @@ Data loaded:
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> imageio</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> io <span class="im">import</span> BytesIO</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create output directory for GIFs</span></span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>gif_output_dir <span class="op">=</span> os.path.join(output_dir, <span class="st">'era5_meteorology_gifs'</span>)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create output directory for GIFs (new clean folder)</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>gif_output_dir <span class="op">=</span> os.path.join(output_dir, <span class="st">'storm_era5_gifs'</span>)</span>
 <span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>os.makedirs(gif_output_dir, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>gif_file_era5 <span class="op">=</span> os.path.join(gif_output_dir, <span class="st">'era5_meteorology_storm1.gif'</span>)</span>
@@ -1010,45 +1002,51 @@ Data loaded:
 <span id="cb33-65"><a href="#cb33-65" aria-hidden="true" tabindex="-1"></a>    plt.close(fig)</span>
 <span id="cb33-66"><a href="#cb33-66" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-67"><a href="#cb33-67" aria-hidden="true" tabindex="-1"></a><span class="co"># Save GIF with fps=0.5 (duration=2.0 seconds per frame)</span></span>
-<span id="cb33-68"><a href="#cb33-68" aria-hidden="true" tabindex="-1"></a>imageio.mimsave(gif_file_era5, frames, fps<span class="op">=</span><span class="fl">0.5</span>)</span>
-<span id="cb33-69"><a href="#cb33-69" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"ERA5 meteorology GIF saved to </span><span class="sc">{</span>gif_file_era5<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb33-68"><a href="#cb33-68" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: imageio.mimsave uses duration parameter (seconds per frame)</span></span>
+<span id="cb33-69"><a href="#cb33-69" aria-hidden="true" tabindex="-1"></a><span class="co"># fps=0.5 means 2.0 seconds per frame</span></span>
+<span id="cb33-70"><a href="#cb33-70" aria-hidden="true" tabindex="-1"></a>imageio.mimsave(gif_file_era5, frames, duration<span class="op">=</span><span class="fl">2.0</span>)</span>
+<span id="cb33-71"><a href="#cb33-71" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"ERA5 meteorology GIF saved to </span><span class="sc">{</span>gif_file_era5<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>/opt/miniconda3/envs/objective1/lib/python3.14/site-packages/cartopy/mpl/feature_artist.py:143: UserWarning: facecolor will have no effect as it has been defined as "never".
   warnings.warn('facecolor will have no effect as it has been '
-/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_70472/1351451507.py:62: DeprecationWarning: Starting with ImageIO v3 the behavior of this function will switch to that of iio.v3.imread. To keep the current behavior (and make this warning disappear) use `import imageio.v2 as imageio` or call `imageio.v2.imread` directly.
+/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_73935/1245067961.py:62: DeprecationWarning: Starting with ImageIO v3 the behavior of this function will switch to that of iio.v3.imread. To keep the current behavior (and make this warning disappear) use `import imageio.v2 as imageio` or call `imageio.v2.imread` directly.
   img = imageio.imread(buf)
 /opt/miniconda3/envs/objective1/lib/python3.14/site-packages/cartopy/mpl/feature_artist.py:143: UserWarning: facecolor will have no effect as it has been defined as "never".
   warnings.warn('facecolor will have no effect as it has been '
-/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_70472/1351451507.py:62: DeprecationWarning: Starting with ImageIO v3 the behavior of this function will switch to that of iio.v3.imread. To keep the current behavior (and make this warning disappear) use `import imageio.v2 as imageio` or call `imageio.v2.imread` directly.
+/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_73935/1245067961.py:62: DeprecationWarning: Starting with ImageIO v3 the behavior of this function will switch to that of iio.v3.imread. To keep the current behavior (and make this warning disappear) use `import imageio.v2 as imageio` or call `imageio.v2.imread` directly.
   img = imageio.imread(buf)
 /opt/miniconda3/envs/objective1/lib/python3.14/site-packages/cartopy/mpl/feature_artist.py:143: UserWarning: facecolor will have no effect as it has been defined as "never".
   warnings.warn('facecolor will have no effect as it has been '
-/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_70472/1351451507.py:62: DeprecationWarning: Starting with ImageIO v3 the behavior of this function will switch to that of iio.v3.imread. To keep the current behavior (and make this warning disappear) use `import imageio.v2 as imageio` or call `imageio.v2.imread` directly.
+/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_73935/1245067961.py:62: DeprecationWarning: Starting with ImageIO v3 the behavior of this function will switch to that of iio.v3.imread. To keep the current behavior (and make this warning disappear) use `import imageio.v2 as imageio` or call `imageio.v2.imread` directly.
   img = imageio.imread(buf)
 /opt/miniconda3/envs/objective1/lib/python3.14/site-packages/cartopy/mpl/feature_artist.py:143: UserWarning: facecolor will have no effect as it has been defined as "never".
   warnings.warn('facecolor will have no effect as it has been '
-/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_70472/1351451507.py:62: DeprecationWarning: Starting with ImageIO v3 the behavior of this function will switch to that of iio.v3.imread. To keep the current behavior (and make this warning disappear) use `import imageio.v2 as imageio` or call `imageio.v2.imread` directly.
+/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_73935/1245067961.py:62: DeprecationWarning: Starting with ImageIO v3 the behavior of this function will switch to that of iio.v3.imread. To keep the current behavior (and make this warning disappear) use `import imageio.v2 as imageio` or call `imageio.v2.imread` directly.
   img = imageio.imread(buf)
 /opt/miniconda3/envs/objective1/lib/python3.14/site-packages/cartopy/mpl/feature_artist.py:143: UserWarning: facecolor will have no effect as it has been defined as "never".
   warnings.warn('facecolor will have no effect as it has been '
-/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_70472/1351451507.py:62: DeprecationWarning: Starting with ImageIO v3 the behavior of this function will switch to that of iio.v3.imread. To keep the current behavior (and make this warning disappear) use `import imageio.v2 as imageio` or call `imageio.v2.imread` directly.
+/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_73935/1245067961.py:62: DeprecationWarning: Starting with ImageIO v3 the behavior of this function will switch to that of iio.v3.imread. To keep the current behavior (and make this warning disappear) use `import imageio.v2 as imageio` or call `imageio.v2.imread` directly.
   img = imageio.imread(buf)
 /opt/miniconda3/envs/objective1/lib/python3.14/site-packages/cartopy/mpl/feature_artist.py:143: UserWarning: facecolor will have no effect as it has been defined as "never".
   warnings.warn('facecolor will have no effect as it has been '</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>ERA5 meteorology GIF saved to output/era5_meteorology_gifs/era5_meteorology_storm1.gif</code></pre>
+<pre><code>ERA5 meteorology GIF saved to output/storm_era5_gifs/era5_meteorology_storm1.gif</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_70472/1351451507.py:62: DeprecationWarning: Starting with ImageIO v3 the behavior of this function will switch to that of iio.v3.imread. To keep the current behavior (and make this warning disappear) use `import imageio.v2 as imageio` or call `imageio.v2.imread` directly.
+<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_73935/1245067961.py:62: DeprecationWarning: Starting with ImageIO v3 the behavior of this function will switch to that of iio.v3.imread. To keep the current behavior (and make this warning disappear) use `import imageio.v2 as imageio` or call `imageio.v2.imread` directly.
   img = imageio.imread(buf)</code></pre>
 </div>
 </div>
-<div id="cell-display-era5-met-storm1-gif" class="cell" data-execution_count="28">
-<div id="display-era5-met-storm1-gif" class="cell-output cell-output-display">
-<pre><code>&lt;IPython.core.display.Image object&gt;</code></pre>
-<p>ERA5 reanalysis pressure and wind fields animation around Storm 1 closure event</p>
+<div id="fig-era5-met-storm1-gif" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-cap="ERA5 reanalysis pressure and wind fields animation around Storm 1 closure event">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-era5-met-storm1-gif-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="output/storm_era5_gifs/era5_meteorology_storm1.gif" class="img-fluid figure-img" data-fig-cap="ERA5 reanalysis pressure and wind fields animation around Storm 1 closure event">
 </div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-era5-met-storm1-gif-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: ERA5 reanalysis pressure and wind fields animation around Storm 1 closure event
+</figcaption>
+</figure>
 </div>
 </section>
 </section>
@@ -1056,7 +1054,7 @@ Data loaded:
 <h2 class="anchored" data-anchor-id="storm-2">Storm 2</h2>
 <section id="water-level-and-surge-analysis-1" class="level3">
 <h3 class="anchored" data-anchor-id="water-level-and-surge-analysis-1">Water Level and Surge Analysis</h3>
-<div id="plot-predicted-high-waters-zoomed-storm2" class="cell" data-fig-height="8" data-fig-width="14" data-execution_count="29">
+<div id="plot-predicted-high-waters-zoomed-storm2" class="cell" data-fig-height="8" data-fig-width="14" data-execution_count="28">
 <div class="cell-output cell-output-display">
 <div id="plot-predicted-high-waters-zoomed-storm2-1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -1072,7 +1070,7 @@ Data loaded:
 <pre><code>&lt;Figure size 672x480 with 0 Axes&gt;</code></pre>
 </div>
 </div>
-<div id="plot-water-level-surge-storm2" class="cell" data-fig-height="10" data-fig-width="14" data-execution_count="30">
+<div id="plot-water-level-surge-storm2" class="cell" data-fig-height="10" data-fig-width="14" data-execution_count="29">
 <div class="cell-output cell-output-display">
 <div id="plot-water-level-surge-storm2-1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -1091,9 +1089,9 @@ Data loaded:
 </section>
 <section id="spatial-surge-and-meteorological-maps-1" class="level3">
 <h3 class="anchored" data-anchor-id="spatial-surge-and-meteorological-maps-1">Spatial Surge and Meteorological Maps</h3>
-<div id="plot-gtsm-surge-storm2" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="33">
+<div id="plot-gtsm-surge-storm2" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="32">
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_70472/3422602430.py:24: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_73935/3422602430.py:24: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout(rect=[0, 0, 0.97, 1])</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -1111,7 +1109,7 @@ Data loaded:
 <pre><code>&lt;Figure size 672x480 with 0 Axes&gt;</code></pre>
 </div>
 </div>
-<div id="plot-era5-met-storm2" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="34">
+<div id="plot-era5-met-storm2" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="33">
 <div class="cell-output cell-output-stderr">
 <pre><code>/opt/miniconda3/envs/objective1/lib/python3.14/site-packages/cartopy/mpl/feature_artist.py:143: UserWarning: facecolor will have no effect as it has been defined as "never".
   warnings.warn('facecolor will have no effect as it has been '
@@ -1125,7 +1123,7 @@ Data loaded:
   warnings.warn('facecolor will have no effect as it has been '
 /opt/miniconda3/envs/objective1/lib/python3.14/site-packages/cartopy/mpl/feature_artist.py:143: UserWarning: facecolor will have no effect as it has been defined as "never".
   warnings.warn('facecolor will have no effect as it has been '
-/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_70472/807461205.py:42: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_73935/807461205.py:42: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout(rect=[0, 0, 0.97, 1])</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -1149,7 +1147,7 @@ Data loaded:
 <h2 class="anchored" data-anchor-id="storm-3">Storm 3</h2>
 <section id="water-level-and-surge-analysis-2" class="level3">
 <h3 class="anchored" data-anchor-id="water-level-and-surge-analysis-2">Water Level and Surge Analysis</h3>
-<div id="plot-predicted-high-waters-zoomed-storm3" class="cell" data-fig-height="8" data-fig-width="14" data-execution_count="35">
+<div id="plot-predicted-high-waters-zoomed-storm3" class="cell" data-fig-height="8" data-fig-width="14" data-execution_count="34">
 <div class="cell-output cell-output-display">
 <div id="plot-predicted-high-waters-zoomed-storm3-1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -1165,7 +1163,7 @@ Data loaded:
 <pre><code>&lt;Figure size 672x480 with 0 Axes&gt;</code></pre>
 </div>
 </div>
-<div id="plot-water-level-surge-storm3" class="cell" data-fig-height="10" data-fig-width="14" data-execution_count="36">
+<div id="plot-water-level-surge-storm3" class="cell" data-fig-height="10" data-fig-width="14" data-execution_count="35">
 <div class="cell-output cell-output-display">
 <div id="plot-water-level-surge-storm3-1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -1184,9 +1182,9 @@ Data loaded:
 </section>
 <section id="spatial-surge-and-meteorological-maps-2" class="level3">
 <h3 class="anchored" data-anchor-id="spatial-surge-and-meteorological-maps-2">Spatial Surge and Meteorological Maps</h3>
-<div id="plot-gtsm-surge-storm3" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="39">
+<div id="plot-gtsm-surge-storm3" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="38">
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_70472/3367164277.py:24: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_73935/3367164277.py:24: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout(rect=[0, 0, 0.97, 1])</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -1204,7 +1202,7 @@ Data loaded:
 <pre><code>&lt;Figure size 672x480 with 0 Axes&gt;</code></pre>
 </div>
 </div>
-<div id="plot-era5-met-storm3" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="40">
+<div id="plot-era5-met-storm3" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="39">
 <div class="cell-output cell-output-stderr">
 <pre><code>/opt/miniconda3/envs/objective1/lib/python3.14/site-packages/cartopy/mpl/feature_artist.py:143: UserWarning: facecolor will have no effect as it has been defined as "never".
   warnings.warn('facecolor will have no effect as it has been '
@@ -1218,7 +1216,7 @@ Data loaded:
   warnings.warn('facecolor will have no effect as it has been '
 /opt/miniconda3/envs/objective1/lib/python3.14/site-packages/cartopy/mpl/feature_artist.py:143: UserWarning: facecolor will have no effect as it has been defined as "never".
   warnings.warn('facecolor will have no effect as it has been '
-/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_70472/86702048.py:42: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_73935/86702048.py:42: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout(rect=[0, 0, 0.97, 1])</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -1242,7 +1240,7 @@ Data loaded:
 <h2 class="anchored" data-anchor-id="storm-5">Storm 5</h2>
 <section id="water-level-and-surge-analysis-3" class="level3">
 <h3 class="anchored" data-anchor-id="water-level-and-surge-analysis-3">Water Level and Surge Analysis</h3>
-<div id="plot-predicted-high-waters-zoomed-storm5" class="cell" data-fig-height="8" data-fig-width="14" data-execution_count="41">
+<div id="plot-predicted-high-waters-zoomed-storm5" class="cell" data-fig-height="8" data-fig-width="14" data-execution_count="40">
 <div class="cell-output cell-output-display">
 <div id="plot-predicted-high-waters-zoomed-storm5-1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -1258,7 +1256,7 @@ Data loaded:
 <pre><code>&lt;Figure size 672x480 with 0 Axes&gt;</code></pre>
 </div>
 </div>
-<div id="plot-water-level-surge-storm5" class="cell" data-fig-height="10" data-fig-width="14" data-execution_count="42">
+<div id="plot-water-level-surge-storm5" class="cell" data-fig-height="10" data-fig-width="14" data-execution_count="41">
 <div class="cell-output cell-output-display">
 <div id="plot-water-level-surge-storm5-1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -1277,9 +1275,9 @@ Data loaded:
 </section>
 <section id="spatial-surge-and-meteorological-maps-3" class="level3">
 <h3 class="anchored" data-anchor-id="spatial-surge-and-meteorological-maps-3">Spatial Surge and Meteorological Maps</h3>
-<div id="plot-gtsm-surge-storm5" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="45">
+<div id="plot-gtsm-surge-storm5" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="44">
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_70472/1456226599.py:24: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_73935/1456226599.py:24: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout(rect=[0, 0, 0.97, 1])</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -1297,7 +1295,7 @@ Data loaded:
 <pre><code>&lt;Figure size 672x480 with 0 Axes&gt;</code></pre>
 </div>
 </div>
-<div id="plot-era5-met-storm5" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="46">
+<div id="plot-era5-met-storm5" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="45">
 <div class="cell-output cell-output-stderr">
 <pre><code>/opt/miniconda3/envs/objective1/lib/python3.14/site-packages/cartopy/mpl/feature_artist.py:143: UserWarning: facecolor will have no effect as it has been defined as "never".
   warnings.warn('facecolor will have no effect as it has been '
@@ -1311,7 +1309,7 @@ Data loaded:
   warnings.warn('facecolor will have no effect as it has been '
 /opt/miniconda3/envs/objective1/lib/python3.14/site-packages/cartopy/mpl/feature_artist.py:143: UserWarning: facecolor will have no effect as it has been defined as "never".
   warnings.warn('facecolor will have no effect as it has been '
-/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_70472/2284480292.py:42: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_73935/2284480292.py:42: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout(rect=[0, 0, 0.97, 1])</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -1335,7 +1333,7 @@ Data loaded:
 <h2 class="anchored" data-anchor-id="storm-6">Storm 6</h2>
 <section id="water-level-and-surge-analysis-4" class="level3">
 <h3 class="anchored" data-anchor-id="water-level-and-surge-analysis-4">Water Level and Surge Analysis</h3>
-<div id="plot-predicted-high-waters-zoomed-storm6" class="cell" data-fig-height="8" data-fig-width="14" data-execution_count="47">
+<div id="plot-predicted-high-waters-zoomed-storm6" class="cell" data-fig-height="8" data-fig-width="14" data-execution_count="46">
 <div class="cell-output cell-output-display">
 <div id="plot-predicted-high-waters-zoomed-storm6-1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -1351,7 +1349,7 @@ Data loaded:
 <pre><code>&lt;Figure size 672x480 with 0 Axes&gt;</code></pre>
 </div>
 </div>
-<div id="plot-water-level-surge-storm6" class="cell" data-fig-height="10" data-fig-width="14" data-execution_count="48">
+<div id="plot-water-level-surge-storm6" class="cell" data-fig-height="10" data-fig-width="14" data-execution_count="47">
 <div class="cell-output cell-output-display">
 <div id="plot-water-level-surge-storm6-1" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -1370,9 +1368,9 @@ Data loaded:
 </section>
 <section id="spatial-surge-and-meteorological-maps-4" class="level3">
 <h3 class="anchored" data-anchor-id="spatial-surge-and-meteorological-maps-4">Spatial Surge and Meteorological Maps</h3>
-<div id="plot-gtsm-surge-storm6" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="51">
+<div id="plot-gtsm-surge-storm6" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="50">
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_70472/3290841739.py:24: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+<pre><code>/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_73935/3290841739.py:24: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout(rect=[0, 0, 0.97, 1])</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -1390,7 +1388,7 @@ Data loaded:
 <pre><code>&lt;Figure size 672x480 with 0 Axes&gt;</code></pre>
 </div>
 </div>
-<div id="plot-era5-met-storm6" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="52">
+<div id="plot-era5-met-storm6" class="cell" data-fig-height="10" data-fig-width="16" data-execution_count="51">
 <div class="cell-output cell-output-stderr">
 <pre><code>/opt/miniconda3/envs/objective1/lib/python3.14/site-packages/cartopy/mpl/feature_artist.py:143: UserWarning: facecolor will have no effect as it has been defined as "never".
   warnings.warn('facecolor will have no effect as it has been '
@@ -1404,7 +1402,7 @@ Data loaded:
   warnings.warn('facecolor will have no effect as it has been '
 /opt/miniconda3/envs/objective1/lib/python3.14/site-packages/cartopy/mpl/feature_artist.py:143: UserWarning: facecolor will have no effect as it has been defined as "never".
   warnings.warn('facecolor will have no effect as it has been '
-/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_70472/1985222966.py:42: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+/var/folders/m8/cp78hgjj6j937vhj63cdm7_c0000gn/T/ipykernel_73935/1985222966.py:42: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout(rect=[0, 0, 0.97, 1])</code></pre>
 </div>
 <div class="cell-output cell-output-display">
