@@ -1,9 +1,6 @@
 project:
   type: website
   output-dir: docs
-  format:
-    html:
-      css: styles.css
   render:
     - index.qmd
     - cloures.qmd
@@ -21,5 +18,6 @@ website:
 
 resources:
   - output
+  - styles.css
   - .nojekyll   # copied to docs/ so GitHub Pages skips Jekyll (best practice)
   # - gif        # only if you have a gif/ folder with assets

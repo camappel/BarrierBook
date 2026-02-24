@@ -496,6 +496,39 @@ plt.show()
 ```
 
 ```{python}
+#| label: plot-predicted-high-waters
+#| fig-cap: "Predicted high waters, observed water levels, and barrier closures for the Eastern Scheldt"
+#| fig-width: 14
+#| fig-height: 8
+
+fig, ax = plt.subplots(figsize=(14, 8))
+
+# Plot vertical lines for barrier closure dates using storm_df
+for closure_date in storm_df['Start of Closure']:
+    ax.axvline(closure_date, color='m', linestyle='--', linewidth=2, alpha=0.7)
+
+# Plot predicted tides (TIP)
+ax.plot(TSP, TIP, 'r', linewidth=1, label='Predicted tide (TIP)', alpha=0.8)
+
+# Plot observed water levels (WLP)
+ax.plot(TSP, WLP, 'b', linewidth=1, label='Observed water level (WLP)', alpha=0.8)
+
+# Plot difference (WLP - TIP) - surge component
+ax.plot(TSP, WLP - TIP, 'g', linewidth=1, label='Surge (WLP - TIP)', alpha=0.8)
+
+# Formatting
+ax.grid(True, alpha=0.3)
+ax.set_xlabel('Date', fontweight='bold', fontsize=16)
+ax.set_ylabel('Level (m)', fontweight='bold', fontsize=16)
+ax.set_ylim(-3, 4)
+ax.legend(fontsize=14, loc='best')
+ax.tick_params(labelsize=14)
+
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
 # For each closure: get max WL, time, predicted tide, and surge (no mask, just indices)
 from scipy.interpolate import interp1d
 
@@ -583,17 +616,22 @@ plt.show()
 ```{python}
 #| label: plot-faceted-closures
 #| include: true
-# Faceted plot: one panel per closure showing water level, predicted tide, and closure period
+# Large faceted plot: one panel per closure showing water level, predicted tide, and closure period
+# Now: always show all storms, arrange 5 per row, and use lower resolution to keep file size small
 
 import math
 
-# Group closures by storm; for each storm, grab min start date and max end date (the 'window' for all closures in the storm)
+ncols = 5  # 5 plots per row
 storms = storm_df['Storm'].unique()
 n_storms = len(storms)
-ncols = 5
 nrows = math.ceil(n_storms / ncols)
 
-fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(7 * ncols, 4 * nrows), sharex=False)
+fig_width = 2.5 * ncols    # More compact per-row width for lower-res output
+fig_height = 2.5 * nrows   # More compact height
+
+fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(fig_width, fig_height), sharex=False, dpi=60) # dpi lowered for disk size
+
+# always be 2d array
 if nrows == 1 and ncols == 1:
     axes = np.array([[axes]])
 elif nrows == 1 or ncols == 1:
@@ -608,68 +646,32 @@ for idx, storm in enumerate(storms):
     tmin = storm_start - pd.Timedelta(hours=24)
     tmax = storm_end + pd.Timedelta(hours=24)
     mask = (TSP >= tmin) & (TSP <= tmax)
-    ax.plot(TSP[mask], WLP[mask], 'b', linewidth=1.5, label='Observed')
-    ax.plot(TSP[mask], TIP[mask], 'r', linewidth=1.2, label='Predicted tide')
+    ax.plot(TSP[mask], WLP[mask], 'b', linewidth=1.1, label='Observed')   # thinner line
+    ax.plot(TSP[mask], TIP[mask], 'r', linewidth=0.8, label='Predicted tide')  # thinner line
     # Highlight each closure period individually
     for cl_idx, row in group.iterrows():
         cl_start = row['Start of Closure']
         cl_end = row['End of Closure']
         label = 'Closure period' if cl_idx == group.index[0] else None  # label only once for legend
-        ax.axvspan(cl_start, cl_end, color='m', alpha=0.25, label=label)
+        ax.axvspan(cl_start, cl_end, color='m', alpha=0.22, label=label)
     # For each closure in this storm, plot the max water level marker (if available)
     for _, row in group.iterrows():
-        if not pd.isnull(row['Max WL Time']):
-            ax.plot(row['Max WL Time'], row['Max WL'], 'ko', label='Max WL')
-    # Set y-axis limit to 3.5m for every subplot
+        if not pd.isnull(row.get('Max WL Time', None)):
+            ax.plot(row['Max WL Time'], row['Max WL'], 'ko', markersize=4, label='Max WL')
     ax.set_ylim(top=3.8)
-    # Add horizontal dashed line at 3m
-    ax.axhline(3, color='black', linestyle=':', linewidth=2)
-    ax.set_title(f"Storm {storm}: {storm_start:%Y-%m-%d}", fontsize=13, fontweight='bold')
-    ax.set_ylabel('Water level (m)')
-    ax.grid(alpha=0.3)
+    ax.axhline(3, color='black', linestyle=':', linewidth=1.2)
+    ax.set_title(f"Storm {storm}: {storm_start:%Y-%m-%d}", fontsize=10, fontweight='bold')
+    ax.set_ylabel('WL (m)', fontsize=8)
+    ax.grid(alpha=0.24)
     ax.set_xlim(tmin, tmax)
-    ax.xaxis.set_tick_params(rotation=30)
-    # Only show legend on first subplot
+    ax.xaxis.set_tick_params(rotation=28, labelsize=8)
+    ax.yaxis.set_tick_params(labelsize=8)
     if idx == 0:
-        ax.legend(fontsize=10, loc='upper left')
+        ax.legend(fontsize=8, loc='upper left')
 
-# Remove empty subplots if nrows*ncols > n_storms
+# Remove unused subplots if nrows*ncols > n_storms
 for j in range(n_storms, nrows * ncols):
     fig.delaxes(axes.flatten()[j])
-
-plt.tight_layout()
-plt.show()
-```
-
-
-```{python}
-#| label: plot-predicted-high-waters
-#| fig-cap: "Predicted high waters, observed water levels, and barrier closures for the Eastern Scheldt"
-#| fig-width: 14
-#| fig-height: 8
-
-fig, ax = plt.subplots(figsize=(14, 8))
-
-# Plot vertical lines for barrier closure dates using storm_df
-for closure_date in storm_df['Start of Closure']:
-    ax.axvline(closure_date, color='m', linestyle='--', linewidth=2, alpha=0.7)
-
-# Plot predicted tides (TIP)
-ax.plot(TSP, TIP, 'r', linewidth=1, label='Predicted tide (TIP)', alpha=0.8)
-
-# Plot observed water levels (WLP)
-ax.plot(TSP, WLP, 'b', linewidth=1, label='Observed water level (WLP)', alpha=0.8)
-
-# Plot difference (WLP - TIP) - surge component
-ax.plot(TSP, WLP - TIP, 'g', linewidth=1, label='Surge (WLP - TIP)', alpha=0.8)
-
-# Formatting
-ax.grid(True, alpha=0.3)
-ax.set_xlabel('Date', fontweight='bold', fontsize=16)
-ax.set_ylabel('Level (m)', fontweight='bold', fontsize=16)
-ax.set_ylim(-3, 4)
-ax.legend(fontsize=14, loc='best')
-ax.tick_params(labelsize=14)
 
 plt.tight_layout()
 plt.show()
