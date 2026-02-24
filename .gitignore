@@ -2,6 +2,7 @@
 .quarto/
 _site/
 docs/
+eastern_scheldt_files/
 
 # Generated output (re-run notebooks to regenerate)
 output/
