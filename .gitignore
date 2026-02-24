@@ -1,15 +1,32 @@
-/.quarto/
-/_site/
-/output/
-!output/**/*.gif
-!output/storm_era5_gifs/
+# Quarto / build
+.quarto/
+_site/
+docs/
+
+# Generated output (re-run notebooks to regenerate)
+output/
+
+# Data / cache
 *.pkl
-.DS_Store
+*.nc
+*.zarr
+
+# Python
 __pycache__/
-*.pyc
-*.qmd
-*.py
-*.yml
-*.css
-/gif/
-/docs/gif/
+*.py[cod]
+*$py.class
+.Python
+*.so
+.venv/
+venv/
+env/
+
+# OS / editor
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Optional: uncomment to keep built site in repo (e.g. for GitHub Pages without CI)
+# !docs/
