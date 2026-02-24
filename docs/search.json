@@ -1,442 +1,212 @@
 [
   {
+    "objectID": "storm.html",
+    "href": "storm.html",
+    "title": "Storm Analysis",
+    "section": "",
+    "text": "This document analyzes storm events (all 25 storms / 31 closures in storm_df), including: 1. Water Level and Surge Charts: Time series of observed water levels, predicted tides, and surge 2. ERA5 Data Download: Downloads meteorological reanalysis data for the storm period 3. Meteorological Map GIF: Creates an animated visualization of pressure fields and wind vectors\n\n\n\n\nParams: run_all=True, storm_index=0\n\n\n\n\nStorms to process: [np.int64(1), np.int64(2), np.int64(3), np.int64(4), np.int64(5), np.int64(6), np.int64(7), np.int64(8), np.int64(9), np.int64(10), np.int64(11), np.int64(12), np.int64(13), np.int64(14), np.int64(15), np.int64(16), np.int64(17), np.int64(18), np.int64(19), np.int64(20), np.int64(21), np.int64(22), np.int64(23), np.int64(24), np.int64(25)]"
+  },
+  {
+    "objectID": "storm.html#setup",
+    "href": "storm.html#setup",
+    "title": "Storm Analysis",
+    "section": "",
+    "text": "Params: run_all=True, storm_index=0\n\n\n\n\nStorms to process: [np.int64(1), np.int64(2), np.int64(3), np.int64(4), np.int64(5), np.int64(6), np.int64(7), np.int64(8), np.int64(9), np.int64(10), np.int64(11), np.int64(12), np.int64(13), np.int64(14), np.int64(15), np.int64(16), np.int64(17), np.int64(18), np.int64(19), np.int64(20), np.int64(21), np.int64(22), np.int64(23), np.int64(24), np.int64(25)]"
+  },
+  {
+    "objectID": "storm.html#inspect-downloaded-codec-gtsm-file",
+    "href": "storm.html#inspect-downloaded-codec-gtsm-file",
+    "title": "Storm Analysis",
+    "section": "Inspect downloaded CODEC GTSM file",
+    "text": "Inspect downloaded CODEC GTSM file\n\n\nExample file: ../2_DATA/3_CODEC_GTSM_API/GTSM_1986_10.nc\nSize: 194,576,548 bytes (185.56 MB)\nFormat: ZIP (extracted in download cell)\nOpenable path: ../2_DATA/3_CODEC_GTSM_API/GTSM_1986_10_extracted/reanalysis_surge_10min_1986_10_v3.nc\n\nDataset structure: ['time', 'stations'] ['surge']"
+  },
+  {
+    "objectID": "storm.html#storm-1",
+    "href": "storm.html#storm-1",
+    "title": "Storm Analysis",
+    "section": "Storm 1",
+    "text": "Storm 1"
+  },
+  {
+    "objectID": "storm.html#storm-2",
+    "href": "storm.html#storm-2",
+    "title": "Storm Analysis",
+    "section": "Storm 2",
+    "text": "Storm 2"
+  },
+  {
+    "objectID": "storm.html#storm-3",
+    "href": "storm.html#storm-3",
+    "title": "Storm Analysis",
+    "section": "Storm 3",
+    "text": "Storm 3"
+  },
+  {
+    "objectID": "storm.html#storm-4",
+    "href": "storm.html#storm-4",
+    "title": "Storm Analysis",
+    "section": "Storm 4",
+    "text": "Storm 4"
+  },
+  {
+    "objectID": "storm.html#storm-5",
+    "href": "storm.html#storm-5",
+    "title": "Storm Analysis",
+    "section": "Storm 5",
+    "text": "Storm 5"
+  },
+  {
+    "objectID": "storm.html#storm-6",
+    "href": "storm.html#storm-6",
+    "title": "Storm Analysis",
+    "section": "Storm 6",
+    "text": "Storm 6"
+  },
+  {
+    "objectID": "storm.html#storm-7",
+    "href": "storm.html#storm-7",
+    "title": "Storm Analysis",
+    "section": "Storm 7",
+    "text": "Storm 7"
+  },
+  {
+    "objectID": "storm.html#storm-8",
+    "href": "storm.html#storm-8",
+    "title": "Storm Analysis",
+    "section": "Storm 8",
+    "text": "Storm 8"
+  },
+  {
+    "objectID": "storm.html#storm-9",
+    "href": "storm.html#storm-9",
+    "title": "Storm Analysis",
+    "section": "Storm 9",
+    "text": "Storm 9"
+  },
+  {
+    "objectID": "storm.html#storm-10",
+    "href": "storm.html#storm-10",
+    "title": "Storm Analysis",
+    "section": "Storm 10",
+    "text": "Storm 10"
+  },
+  {
+    "objectID": "storm.html#storm-11",
+    "href": "storm.html#storm-11",
+    "title": "Storm Analysis",
+    "section": "Storm 11",
+    "text": "Storm 11"
+  },
+  {
+    "objectID": "storm.html#storm-12",
+    "href": "storm.html#storm-12",
+    "title": "Storm Analysis",
+    "section": "Storm 12",
+    "text": "Storm 12"
+  },
+  {
+    "objectID": "storm.html#storm-13",
+    "href": "storm.html#storm-13",
+    "title": "Storm Analysis",
+    "section": "Storm 13",
+    "text": "Storm 13"
+  },
+  {
+    "objectID": "storm.html#storm-14",
+    "href": "storm.html#storm-14",
+    "title": "Storm Analysis",
+    "section": "Storm 14",
+    "text": "Storm 14"
+  },
+  {
+    "objectID": "storm.html#storm-15",
+    "href": "storm.html#storm-15",
+    "title": "Storm Analysis",
+    "section": "Storm 15",
+    "text": "Storm 15"
+  },
+  {
+    "objectID": "storm.html#storm-16",
+    "href": "storm.html#storm-16",
+    "title": "Storm Analysis",
+    "section": "Storm 16",
+    "text": "Storm 16"
+  },
+  {
+    "objectID": "storm.html#storm-17",
+    "href": "storm.html#storm-17",
+    "title": "Storm Analysis",
+    "section": "Storm 17",
+    "text": "Storm 17"
+  },
+  {
+    "objectID": "storm.html#storm-18",
+    "href": "storm.html#storm-18",
+    "title": "Storm Analysis",
+    "section": "Storm 18",
+    "text": "Storm 18"
+  },
+  {
+    "objectID": "storm.html#storm-19",
+    "href": "storm.html#storm-19",
+    "title": "Storm Analysis",
+    "section": "Storm 19",
+    "text": "Storm 19"
+  },
+  {
+    "objectID": "storm.html#storm-20",
+    "href": "storm.html#storm-20",
+    "title": "Storm Analysis",
+    "section": "Storm 20",
+    "text": "Storm 20"
+  },
+  {
+    "objectID": "storm.html#storm-21",
+    "href": "storm.html#storm-21",
+    "title": "Storm Analysis",
+    "section": "Storm 21",
+    "text": "Storm 21"
+  },
+  {
+    "objectID": "storm.html#storm-22",
+    "href": "storm.html#storm-22",
+    "title": "Storm Analysis",
+    "section": "Storm 22",
+    "text": "Storm 22"
+  },
+  {
+    "objectID": "storm.html#storm-23",
+    "href": "storm.html#storm-23",
+    "title": "Storm Analysis",
+    "section": "Storm 23",
+    "text": "Storm 23"
+  },
+  {
+    "objectID": "storm.html#storm-24",
+    "href": "storm.html#storm-24",
+    "title": "Storm Analysis",
+    "section": "Storm 24",
+    "text": "Storm 24"
+  },
+  {
+    "objectID": "storm.html#storm-25",
+    "href": "storm.html#storm-25",
+    "title": "Storm Analysis",
+    "section": "Storm 25",
+    "text": "Storm 25"
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Barrier Book",
     "section": "",
-    "text": "Barrier Book is an interactive documentation and analysis site exploring the functioning, operation, meteorological context, and flood defense performance of major storm surge barriers.\nThis site presents: - Barrier closure histories: Analyzing when and why flood barriers were closed over the past decades. - Tidal and water level data: Processing long-term tide gauge observations and predicted astronomical tides. - Meteorological conditions during storms: Examining wind, pressure, and storm data associated with each closure. - Spatio-temporal characteristics: Exploring the spatial and temporal patterns of storm events and barrier operations. - Visualizations: Comprehensive figures showing barrier operations, extreme sea levels, meteorological extremes, and trends. - Workflows and notebooks: Step-by-step technical analyses and reproducible code using Python and Quarto.\nBarrier Book is designed for researchers, civil engineers, and decision-makers interested in flood risk, coastal defense, and climate adaptation.\nAll analysis code and workflows are open and reproducible, with data sourced from official Dutch and UK agencies.",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Home"
-    ]
+    "text": "Barrier Book is an interactive documentation and analysis site exploring the functioning, operation, meteorological context, and flood defense performance of major storm surge barriers.\nThis site presents: - Barrier closure histories: Analyzing when and why flood barriers were closed over the past decades. - Tidal and water level data: Processing long-term tide gauge observations and predicted astronomical tides. - Meteorological conditions during storms: Examining wind, pressure, and storm data associated with each closure. - Spatio-temporal characteristics: Exploring the spatial and temporal patterns of storm events and barrier operations. - Visualizations: Comprehensive figures showing barrier operations, extreme sea levels, meteorological extremes, and trends. - Workflows and notebooks: Step-by-step technical analyses and reproducible code using Python and Quarto.\nBarrier Book is designed for researchers, civil engineers, and decision-makers interested in flood risk, coastal defense, and climate adaptation.\nAll analysis code and workflows are open and reproducible, with data sourced from official Dutch and UK agencies."
   },
   {
-    "objectID": "thames.html",
-    "href": "thames.html",
-    "title": "Thames Barrier",
-    "section": "",
-    "text": "This document provides a complete analysis workflow for the Thames barrier system, combining barrier closure analysis, tide gauge data processing, tidal analysis, and visualization. The analysis covers the period from 1986 to 2024 and includes:\nWater years run from July 1 to June 30, which is more appropriate for coastal flood analysis than calendar years.",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#analysis",
-    "href": "thames.html#analysis",
-    "title": "Thames Barrier",
-    "section": "Analysis",
-    "text": "Analysis\n\n# 2. Count closures per water year (July 1 to July 1)\nOCS = []  # Will store [index, year, year+1, num_closures]\nYT = []   # Will store year labels like \"1986/87\"\n\nfor co, y in enumerate(Y, start=1):\n    # Find closures between July 1 of year y and July 1 of year y+1\n    start_date = datetime(y, 7, 1, 0, 0, 0)\n    end_date = datetime(y + 1, 7, 1, 0, 0, 0)\n    \n    # Count closures in this water year\n    closures_in_year = [d for d in OCD if start_date &lt;= d &lt; end_date]\n    num_closures = len(closures_in_year)\n    \n    OCS.append([co, y, y + 1, num_closures])\n    \n    # Create year label (e.g., \"1986/87\")\n    year_str = str(y + 1)\n    YT.append(f\"{y}/{year_str[2:]}\")\n\nOCS = np.array(OCS)\n\nprint(f\"\\nClosures per water year calculated for {len(OCS)} years\")\nprint(f\"  Total closures: {np.sum(OCS[:, 3])}\")\n\n\nClosures per water year calculated for 39 years\n  Total closures: 219\n\n\n\n# 3. Calculate statistics\nE = np.array([\n    np.min(OCS[:, 3]),      # Minimum closures per year\n    np.mean(OCS[:, 3]),     # Mean closures per year\n    np.max(OCS[:, 3]),      # Maximum closures per year\n    np.sum(OCS[:, 3])       # Total closures\n])\n\nprint(f\"\\nClosure statistics:\")\nprint(f\"  Min per year: {E[0]:.1f}\")\nprint(f\"  Mean per year: {E[1]:.2f}\")\nprint(f\"  Max per year: {E[2]:.1f}\")\nprint(f\"  Total: {E[3]:.0f}\")\n\n\nClosure statistics:\n  Min per year: 0.0\n  Mean per year: 5.62\n  Max per year: 50.0\n  Total: 219\n\n\n\n# 4. Save data\noutput_file = os.path.join(output_dir, 'mast1_thames.pkl')\nwith open(output_file, 'wb') as f:\n    pickle.dump({\n        'OCD': OCD,\n        'OCS': OCS,\n        'E': E,\n        'YT': YT\n    }, f)\nprint(f\"\\nData saved to {output_file}\")\n\n\nData saved to output/mast1_thames.pkl",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#visualization",
-    "href": "thames.html#visualization",
-    "title": "Thames Barrier",
-    "section": "Visualization",
-    "text": "Visualization\nThis bar chart shows the number of barrier closures per water year from 1986/87 to 2024/25. The Thames Barrier closes when water levels exceed a threshold, typically during storm surge events.\n\nfig, ax = plt.subplots(figsize=(12, 6))\nax.bar(OCS[:, 0], OCS[:, 3], color='black')\nax.set_xlim(0.2, len(OCS) + 0.8)\nax.set_xticks(range(1, len(OCS) + 1))\nax.set_xticklabels(YT, rotation=90)\n# Note: y-axis limit may need adjustment based on actual data\nmax_closures = int(np.max(OCS[:, 3])) + 1\nax.set_ylim(0, max_closures)\nax.set_yticks(range(0, max_closures + 1, max(1, max_closures // 10)))\nax.set_ylabel('Number of closures', fontweight='bold', fontsize=18)\nax.set_title('Thames Barrier', fontweight='bold', fontsize=18)\nax.grid(True, alpha=0.3)\nax.tick_params(labelsize=16)\n\nplt.tight_layout()\nplt.show()\n\n# Save figure\nfig_file = os.path.join(output_dir, 'master1_thames_closures.png')\nplt.savefig(fig_file, dpi=150, bbox_inches='tight')\nprint(f\"\\nFigure saved to {fig_file}\")\n\n\n\n\nNumber of Thames Barrier closures per water year (July 1 to June 30), 1986-2024\n\n\n\n\n\nFigure saved to output/master1_thames_closures.png\n\n\n&lt;Figure size 672x480 with 0 Axes&gt;\n\n\nThe following table lists all barrier closure dates, which correspond to storm events that triggered the Thames Barrier.\n\n# Create DataFrame with closure dates\nstorms_df = pd.DataFrame({\n    'Closure Date': [d.strftime('%Y-%m-%d %H:%M') if isinstance(d, datetime) else str(d) for d in OCD],\n    'Year': [d.year if isinstance(d, datetime) else None for d in OCD],\n    'Month': [d.strftime('%B') if isinstance(d, datetime) else None for d in OCD],\n    'YearMonth': [(d.year, d.month) if isinstance(d, datetime) else None for d in OCD]\n})\n\n# Add water year information\ndef get_water_year(date):\n    \"\"\"Determine water year (July 1 to June 30)\"\"\"\n    if isinstance(date, datetime):\n        if date.month &gt;= 7:\n            return f\"{date.year}/{str(date.year + 1)[2:]}\"\n        else:\n            return f\"{date.year - 1}/{str(date.year)[2:]}\"\n    return None\n\nstorms_df['Water Year'] = [get_water_year(d) for d in OCD]\n\n# Create index that groups storms by year and month\n# Storms in the same year and month get the same index\nunique_year_months = storms_df['YearMonth'].unique()\nyear_month_to_index = {ym: idx + 1 for idx, ym in enumerate(sorted(unique_year_months))}\nstorms_df['Event'] = storms_df['YearMonth'].map(year_month_to_index)\n\n# Reorder columns (Index first, then remove YearMonth helper column)\nstorms_df = storms_df[['Event', 'Closure Date', 'Water Year', 'Year', 'Month']]\n\n# Display table\nprint(f\"\\nTotal number of closures: {len(storms_df)}\")\nstorms_df\n\n\nTotal number of closures: 221\n\n\n\n\n\n\nComplete list of Thames Barrier closures (storm events), 1986-2024\n\n\n\nEvent\nClosure Date\nWater Year\nYear\nMonth\n\n\n\n\n0\n1\n1983-02-01 00:00\n1982/83\n1983\nFebruary\n\n\n1\n2\n1985-12-26 00:00\n1985/86\n1985\nDecember\n\n\n2\n3\n1987-03-29 00:00\n1986/87\n1987\nMarch\n\n\n3\n4\n1988-12-24 00:00\n1988/89\n1988\nDecember\n\n\n4\n5\n1990-02-12 00:00\n1989/90\n1990\nFebruary\n\n\n...\n...\n...\n...\n...\n...\n\n\n216\n83\n2024-03-11 00:00\n2023/24\n2024\nMarch\n\n\n217\n83\n2024-03-14 00:00\n2023/24\n2024\nMarch\n\n\n218\n83\n2024-03-14 00:00\n2023/24\n2024\nMarch\n\n\n219\n84\n2024-04-08 00:00\n2023/24\n2024\nApril\n\n\n220\n84\n2024-04-09 00:00\n2023/24\n2024\nApril\n\n\n\n\n221 rows × 5 columns",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#save-results-part-2",
-    "href": "thames.html#save-results-part-2",
-    "title": "Thames Barrier",
-    "section": "Save Results (Part 2)",
-    "text": "Save Results (Part 2)\nSave the combined time series to a pickle file for use in subsequent analyses.\n\n# Save data\noutput_file = os.path.join(output_dir, 'mast2_thames.pkl')\nwith open(output_file, 'wb') as f:\n    pickle.dump({\n        'TSP': TSP,\n        'WLP': WLP,\n        'TSCHECK': TSP  # Reference time series\n    }, f)\nprint(f\"\\nData saved to {output_file}\")\n\n\nData saved to output/mast2_thames.pkl",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#visualization-part-2",
-    "href": "thames.html#visualization-part-2",
-    "title": "Thames Barrier",
-    "section": "Visualization (Part 2)",
-    "text": "Visualization (Part 2)\nThis figure shows the combined tide gauge water level time series from 1986 to 2023 at 10-minute intervals. The data shows tidal variations, storm surges, and long-term water level patterns over the period.\n\nfig, ax = plt.subplots(figsize=(14, 6))\nax.plot(TSP, WLP, 'b', linewidth=0.5)\nax.set_xlabel('Date', fontweight='bold', fontsize=20)\nax.set_ylabel('Water level (m NAP)', fontweight='bold', fontsize=20)\nax.grid(True, alpha=0.3)\nax.tick_params(labelsize=16)\n\nplt.tight_layout()\nplt.show()\n\n# Save figure\nfig_file = os.path.join(output_dir, 'master2_thames_tide_gauge.png')\nplt.savefig(fig_file, dpi=150, bbox_inches='tight')\nprint(f\"\\nFigure saved to {fig_file}\")\n\n\n\n\nCombined tide gauge water level time series for the Thames, 1986-2023. Data at 10-minute intervals.\n\n\n\n\n\nFigure saved to output/master2_thames_tide_gauge.png\n\n\n&lt;Figure size 672x480 with 0 Axes&gt;",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#setup-and-configuration",
-    "href": "thames.html#setup-and-configuration",
-    "title": "Thames Barrier",
-    "section": "Setup and Configuration",
-    "text": "Setup and Configuration\n\nimport numpy as np\nimport pandas as pd\nimport pickle\nimport matplotlib.pyplot as plt\nfrom datetime import datetime\nfrom pytides.tide import Tide\nimport os\n\n# Configuration\nY = list(range(1986, 2024))  # Years 1986 to 2023\nth = 60  # Data quality threshold (percentage)\nlat = 51.5  # Latitude for tidal analysis (Thames Barrier approximate location)\noutput_dir = 'output'\n\n# Create output directory if it doesn't exist\nos.makedirs(output_dir, exist_ok=True)\n\nprint(f\"Analysis configuration:\")\nprint(f\"  Years: {Y[0]} to {Y[-1]} ({len(Y)} years)\")\nprint(f\"  Data quality threshold: {th}%\")\nprint(f\"  Latitude: {lat}°\")\n\nAnalysis configuration:\n  Years: 1986 to 2023 (38 years)\n  Data quality threshold: 60%\n  Latitude: 51.5°",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#load-tide-gauge-data",
-    "href": "thames.html#load-tide-gauge-data",
-    "title": "Thames Barrier",
-    "section": "Load Tide Gauge Data",
-    "text": "Load Tide Gauge Data\n\nprint(\"Loading tide gauge data...\")\nmast2_file = os.path.join(output_dir, 'mast2_thames.pkl')\nif not os.path.exists(mast2_file):\n    raise FileNotFoundError(\n        f\"Required file {mast2_file} not found. \"\n        \"Please run Part 2 (Tide Gauge Data Processing) first to generate the required data file.\"\n    )\nwith open(mast2_file, 'rb') as f:\n    data = pickle.load(f)\n    TSP = data['TSP']\n    WLP = data['WLP']\n\n# Convert to numpy arrays if needed\nTSP = np.array(TSP)\nWLP = np.array(WLP)\n\nprint(f\"Loaded {len(TSP):,} data points\")\nprint(f\"  Start: {TSP[0]}\")\nprint(f\"  End: {TSP[-1]}\")\nprint(f\"  Valid data: {np.sum(~np.isnan(WLP)):,} points ({100*np.sum(~np.isnan(WLP))/len(WLP):.1f}%)\")\n\nLoading tide gauge data...\nLoaded 1,998,576 data points\n  Start: 1986-01-01 00:00:00\n  End: 2023-12-31 23:50:00\n  Valid data: 1,124,886 points (56.3%)",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#calculate-data-quality-per-year",
-    "href": "thames.html#calculate-data-quality-per-year",
-    "title": "Thames Barrier",
-    "section": "Calculate Data Quality Per Year",
-    "text": "Calculate Data Quality Per Year\n\nprint(\"\\nCalculating data quality per year...\")\nDQ = []\n\nfor y in Y:\n    # Find data points in this calendar year (Jan 1 to Jan 1 next year)\n    start_date = datetime(y, 1, 1, 0, 0, 0)\n    end_date = datetime(y + 1, 1, 1, 0, 0, 0)\n    mask = (TSP &gt;= start_date) & (TSP &lt; end_date)\n    j = np.where(mask)[0]\n    \n    if len(j) == 0:\n        quality = 0\n    else:\n        # Count non-NaN values\n        k = np.where(~np.isnan(WLP[j]))[0]\n        quality = (len(k) / len(j)) * 100\n    \n    # Initialize with 3 columns: [year, quality, reference_year]\n    # reference_year will be filled in during tidal analysis\n    DQ.append([y, quality, np.nan])\n\nDQ = np.array(DQ)\n\n# Display summary statistics\nprint(f\"\\nData quality summary:\")\nprint(f\"  Range: {np.min(DQ[:, 1]):.1f}% to {np.max(DQ[:, 1]):.1f}%\")\nprint(f\"  Mean: {np.mean(DQ[:, 1]):.1f}%\")\nprint(f\"  Years with quality &gt;= {th}%: {np.sum(DQ[:, 1] &gt;= th)}/{len(Y)}\")\n\n\nCalculating data quality per year...\n\nData quality summary:\n  Range: 0.0% to 100.0%\n  Mean: 56.3%\n  Years with quality &gt;= 60%: 17/38",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#tidal-analysis-and-prediction",
-    "href": "thames.html#tidal-analysis-and-prediction",
-    "title": "Thames Barrier",
-    "section": "Tidal Analysis and Prediction",
-    "text": "Tidal Analysis and Prediction\nFor each target year, the analysis determines a reference year, extracts data, performs harmonic decomposition, and generates predictions.\n\nprint(\"\\nPerforming tidal analysis and prediction...\")\nTSP2 = []\nTIP = []\n\nfor co, y in enumerate(Y):\n    print(f\"  Processing year {y} ({co+1}/{len(Y)})...\")\n    \n    # Determine reference year\n    if DQ[co, 1] &gt;= th:\n        # Use target year as reference\n        yr = y\n        DQ[co, 2] = yr\n    else:\n        # Find nearest year with quality &gt;= threshold\n        # Calculate distances from target year\n        distances = np.abs(DQ[:, 0] - y)\n        \n        # Filter to only years with quality &gt;= threshold\n        good_mask = DQ[:, 1] &gt;= th\n        \n        if np.any(good_mask):\n            # Get distances for good years only\n            good_distances = distances[good_mask]\n            good_indices = np.where(good_mask)[0]\n            \n            # Find nearest good year\n            nearest_idx = good_indices[np.argmin(good_distances)]\n            yr = int(DQ[nearest_idx, 0])\n        else:\n            # Fallback: use year with best quality\n            best_idx = np.argmax(DQ[:, 1])\n            yr = int(DQ[best_idx, 0])\n        \n        DQ[co, 2] = yr\n    \n    # Extract reference year data (1 year + 1 day for analysis)\n    ref_start = datetime(yr, 1, 1, 0, 0, 0)\n    ref_end = datetime(yr + 1, 1, 2, 0, 0, 0)  # +1 day\n    \n    mask_ref = (TSP &gt;= ref_start) & (TSP &lt; ref_end)\n    j_ref = np.where(mask_ref)[0]\n    \n    if len(j_ref) == 0:\n        print(f\"    Warning: No data found for reference year {yr}\")\n        continue\n    \n    # Get water levels and times for reference year\n    WLP_ref = WLP[j_ref]\n    TSP_ref = TSP[j_ref]\n    \n    # Remove NaN values for pytides analysis\n    valid_mask = ~np.isnan(WLP_ref)\n    WLP_clean = WLP_ref[valid_mask]\n    TSP_clean = TSP_ref[valid_mask]\n    \n    if len(WLP_clean) &lt; 1000:  # Need sufficient data for analysis\n        print(f\"    Warning: Insufficient data for reference year {yr} ({len(WLP_clean)} points)\")\n        continue\n    \n    # Perform tidal analysis using pytides\n    try:\n        tide_model = Tide.decompose(\n            heights=WLP_clean,\n            t=TSP_clean\n        )\n        print(f\"    Analyzed {len(WLP_clean):,} points from reference year {yr}\")\n    except Exception as e:\n        print(f\"    Error in tidal analysis for year {y}: {e}\")\n        continue\n    \n    # Generate prediction timestamps for target year (10-minute intervals)\n    pred_start = datetime(y, 1, 1, 0, 0, 0)\n    pred_end = datetime(y, 12, 31, 23, 50, 0)\n    tsp2 = pd.date_range(start=pred_start, end=pred_end, freq='10min').to_pydatetime()\n    \n    # Predict tides\n    try:\n        tip = tide_model.at(tsp2)\n        TIP.extend(tip)\n        TSP2.extend(tsp2)\n        print(f\"    Predicted {len(tip):,} points for year {y}\")\n    except Exception as e:\n        print(f\"    Error in prediction for year {y}: {e}\")\n        continue\n\n# Convert to numpy arrays\nTSP2 = np.array(TSP2)\nTIP = np.array(TIP)\n\nprint(f\"\\nTotal predictions: {len(TIP):,} points\")\nif len(TIP) &gt; 0:\n    print(f\"  Start: {TSP2[0]}\")\n    print(f\"  End: {TSP2[-1]}\")\n\n\nPerforming tidal analysis and prediction...\n  Processing year 1986 (1/38)...\n    Analyzed 52,704 points from reference year 1993\n    Predicted 52,560 points for year 1986\n  Processing year 1987 (2/38)...\n    Analyzed 52,704 points from reference year 1993\n    Predicted 52,560 points for year 1987\n  Processing year 1988 (3/38)...\n    Analyzed 52,704 points from reference year 1993\n    Predicted 52,704 points for year 1988\n  Processing year 1989 (4/38)...\n    Analyzed 52,704 points from reference year 1993\n    Predicted 52,560 points for year 1989\n  Processing year 1990 (5/38)...\n    Analyzed 52,704 points from reference year 1993\n    Predicted 52,560 points for year 1990\n  Processing year 1991 (6/38)...\n    Analyzed 52,704 points from reference year 1993\n    Predicted 52,560 points for year 1991\n  Processing year 1992 (7/38)...\n    Analyzed 52,704 points from reference year 1993\n    Predicted 52,704 points for year 1992\n  Processing year 1993 (8/38)...\n    Analyzed 52,704 points from reference year 1993\n    Predicted 52,560 points for year 1993\n  Processing year 1994 (9/38)...\n    Analyzed 52,297 points from reference year 1994\n    Predicted 52,560 points for year 1994\n  Processing year 1995 (10/38)...\n    Analyzed 52,704 points from reference year 1995\n    Predicted 52,560 points for year 1995\n  Processing year 1996 (11/38)...\n    Analyzed 51,828 points from reference year 1996\n    Predicted 52,704 points for year 1996\n  Processing year 1997 (12/38)...\n    Analyzed 51,974 points from reference year 1997\n    Predicted 52,560 points for year 1997\n  Processing year 1998 (13/38)...\n    Analyzed 52,704 points from reference year 1998\n    Predicted 52,560 points for year 1998\n  Processing year 1999 (14/38)...\n    Analyzed 51,878 points from reference year 1999\n    Predicted 52,560 points for year 1999\n  Processing year 2000 (15/38)...\n    Analyzed 49,732 points from reference year 2000\n    Predicted 52,704 points for year 2000\n  Processing year 2001 (16/38)...\n    Analyzed 40,906 points from reference year 2001\n    Predicted 52,560 points for year 2001\n  Processing year 2002 (17/38)...\n    Analyzed 37,410 points from reference year 2002\n    Predicted 52,560 points for year 2002\n  Processing year 2003 (18/38)...\n    Analyzed 52,625 points from reference year 2003\n    Predicted 52,560 points for year 2003\n  Processing year 2004 (19/38)...\n    Analyzed 52,848 points from reference year 2004\n    Predicted 52,704 points for year 2004\n  Processing year 2005 (20/38)...\n    Analyzed 52,704 points from reference year 2005\n    Predicted 52,560 points for year 2005\n  Processing year 2006 (21/38)...\n    Analyzed 52,249 points from reference year 2006\n    Predicted 52,560 points for year 2006\n  Processing year 2007 (22/38)...\n    Analyzed 39,679 points from reference year 2007\n    Predicted 52,560 points for year 2007\n  Processing year 2008 (23/38)...\n    Analyzed 33,152 points from reference year 2008\n    Predicted 52,704 points for year 2008\n  Processing year 2009 (24/38)...\n    Analyzed 33,152 points from reference year 2008\n    Predicted 52,560 points for year 2009\n  Processing year 2010 (25/38)...\n    Analyzed 33,152 points from reference year 2008\n    Predicted 52,560 points for year 2010\n  Processing year 2011 (26/38)...\n    Analyzed 33,152 points from reference year 2008\n    Predicted 52,560 points for year 2011\n  Processing year 2012 (27/38)...\n    Analyzed 33,152 points from reference year 2008\n    Predicted 52,704 points for year 2012\n  Processing year 2013 (28/38)...\n    Analyzed 33,152 points from reference year 2008\n    Predicted 52,560 points for year 2013\n  Processing year 2014 (29/38)...\n    Analyzed 33,152 points from reference year 2008\n    Predicted 52,560 points for year 2014\n  Processing year 2015 (30/38)...\n    Analyzed 33,152 points from reference year 2008\n    Predicted 52,560 points for year 2015\n  Processing year 2016 (31/38)...\n    Analyzed 47,468 points from reference year 2022\n    Predicted 52,704 points for year 2016\n  Processing year 2017 (32/38)...\n    Analyzed 47,468 points from reference year 2022\n    Predicted 52,560 points for year 2017\n  Processing year 2018 (33/38)...\n    Analyzed 47,468 points from reference year 2022\n    Predicted 52,560 points for year 2018\n  Processing year 2019 (34/38)...\n    Analyzed 47,468 points from reference year 2022\n    Predicted 52,560 points for year 2019\n  Processing year 2020 (35/38)...\n    Analyzed 47,468 points from reference year 2022\n    Predicted 52,704 points for year 2020\n  Processing year 2021 (36/38)...\n    Analyzed 47,468 points from reference year 2022\n    Predicted 52,560 points for year 2021\n  Processing year 2022 (37/38)...\n    Analyzed 47,468 points from reference year 2022\n    Predicted 52,560 points for year 2022\n  Processing year 2023 (38/38)...\n    Analyzed 47,468 points from reference year 2022\n    Predicted 52,560 points for year 2023\n\nTotal predictions: 1,998,576 points\n  Start: 1986-01-01 00:00:00\n  End: 2023-12-31 23:50:00",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#save-results-part-3",
-    "href": "thames.html#save-results-part-3",
-    "title": "Thames Barrier",
-    "section": "Save Results (Part 3)",
-    "text": "Save Results (Part 3)\n\noutput_file = os.path.join(output_dir, 'mast3_thames.pkl')\nwith open(output_file, 'wb') as f:\n    pickle.dump({\n        'TSP': TSP,\n        'WLP': WLP,\n        'TIP': TIP,\n        'TSP2': TSP2,\n        'DQ': DQ\n    }, f)\nprint(f\"Data saved to {output_file}\")\n\nData saved to output/mast3_thames.pkl",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#visualization-part-3",
-    "href": "thames.html#visualization-part-3",
-    "title": "Thames Barrier",
-    "section": "Visualization (Part 3)",
-    "text": "Visualization (Part 3)\nThis figure compares observed water levels (blue) with predicted astronomical tides (red) from harmonic analysis. The predicted tides represent the astronomical component only, while observed water levels include both tides and meteorological effects.\n\nfig, ax = plt.subplots(figsize=(14, 6))\nax.plot(TSP2, TIP, 'r', linewidth=0.5, label='Predicted tide', alpha=0.7)\nax.plot(TSP, WLP, 'b', linewidth=0.5, label='Observed water level', alpha=0.7)\nax.set_xlabel('Date', fontweight='bold', fontsize=16)\nax.set_ylabel('Level (m NAP)', fontweight='bold', fontsize=16)\nax.legend(fontsize=14)\nax.grid(True, alpha=0.3)\nax.tick_params(labelsize=14)\n\nplt.tight_layout()\nplt.show()\n\n# Save figure\nfig_file = os.path.join(output_dir, 'master3_thames_tidal_analysis.png')\nplt.savefig(fig_file, dpi=150, bbox_inches='tight')\nprint(f\"\\nFigure saved to {fig_file}\")\n\n\n\n\nComparison of observed water levels (blue) and predicted astronomical tides (red) for the Thames, 1986-2023\n\n\n\n\n\nFigure saved to output/master3_thames_tidal_analysis.png\n\n\n&lt;Figure size 672x480 with 0 Axes&gt;",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#introduction",
-    "href": "thames.html#introduction",
-    "title": "Thames Barrier",
-    "section": "Introduction",
-    "text": "Introduction\nThis section plots time-series of predicted high waters and barrier closures for the Thames. The analysis:\n\nLoads barrier closure dates and tide gauge data from previous analyses\nCreates a visualization showing:\n\nBarrier closure dates as vertical dashed lines\nPredicted astronomical tides (TIP)\nObserved water levels (WLP)\nThe difference between observed and predicted levels (surge component)\n\n\nThis visualization helps identify when barrier closures occurred relative to predicted high waters and actual water levels.",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#setup-and-configuration-1",
-    "href": "thames.html#setup-and-configuration-1",
-    "title": "Thames Barrier",
-    "section": "Setup and Configuration",
-    "text": "Setup and Configuration\n\nimport numpy as np\nimport pandas as pd\nimport pickle\nimport matplotlib.pyplot as plt\nfrom datetime import datetime\nimport os\n\n# Output directory\noutput_dir = 'output'\nos.makedirs(output_dir, exist_ok=True)\n\nprint(f\"Analysis configuration:\")\nprint(f\"  Output directory: {output_dir}\")\n\nAnalysis configuration:\n  Output directory: output",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#load-data",
-    "href": "thames.html#load-data",
-    "title": "Thames Barrier",
-    "section": "Load Data",
-    "text": "Load Data\n\n# Load barrier closure data from master1\nprint(\"Loading barrier closure data...\")\nmast1_file = os.path.join(output_dir, 'mast1_thames.pkl')\nif not os.path.exists(mast1_file):\n    raise FileNotFoundError(\n        f\"Required file {mast1_file} not found. \"\n        \"Please run Part 1 (Barrier Closure Analysis) first to generate the required data file.\"\n    )\nwith open(mast1_file, 'rb') as f:\n    data1 = pickle.load(f)\n    OCD = data1['OCD']  # Observed closure dates\n\n# Load tide gauge and tidal prediction data from master3\nprint(\"Loading tide gauge and tidal prediction data...\")\nmast3_file = os.path.join(output_dir, 'mast3_thames.pkl')\nif not os.path.exists(mast3_file):\n    raise FileNotFoundError(\n        f\"Required file {mast3_file} not found. \"\n        \"Please run Part 1, Part 2, and Part 3 first to generate the required data files.\"\n    )\nwith open(mast3_file, 'rb') as f:\n    data3 = pickle.load(f)\n    TSP = data3['TSP']  # Time series for observed water levels\n    TSP2 = data3['TSP2']  # Time series for predictions\n    TIP = data3['TIP']  # Predicted tides\n    WLP = data3['WLP']  # Observed water levels\n\n# Convert to numpy arrays if needed\nOCD = np.array(OCD)\nTSP = np.array(TSP)\nTSP2 = np.array(TSP2)\nTIP = np.array(TIP)\nWLP = np.array(WLP)\n\nprint(f\"\\nData loaded:\")\nprint(f\"  Closure dates: {len(OCD)} closures\")\nif len(OCD) &gt; 0:\n    print(f\"    First closure: {OCD[0]}\")\n    print(f\"    Last closure: {OCD[-1]}\")\nprint(f\"  Time series points (observed): {len(TSP):,}\")\nprint(f\"  Time series points (predictions): {len(TSP2):,}\")\nprint(f\"  Predicted tides: {len(TIP):,}\")\nprint(f\"  Observed water levels: {len(WLP):,}\")\n\nLoading barrier closure data...\nLoading tide gauge and tidal prediction data...\n\nData loaded:\n  Closure dates: 221 closures\n    First closure: 1983-02-01 00:00:00\n    Last closure: 2024-04-09 00:00:00\n  Time series points (observed): 1,998,576\n  Time series points (predictions): 1,998,576\n  Predicted tides: 1,998,576\n  Observed water levels: 1,998,576",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#figure---predicted-high-waters-and-closures",
-    "href": "thames.html#figure---predicted-high-waters-and-closures",
-    "title": "Thames Barrier",
-    "section": "Figure - Predicted High Waters and Closures",
-    "text": "Figure - Predicted High Waters and Closures\nThis figure shows predicted astronomical tides (red), observed water levels (blue), the difference between them (green), and barrier closure dates (vertical dashed magenta lines). The difference (WLP-TIP) represents the non-tidal component, primarily storm surge.\n\nfig, ax = plt.subplots(figsize=(14, 8))\n\n# Plot vertical lines for barrier closure dates\nfor i in range(len(OCD)):\n    ax.axvline(OCD[i], color='m', linestyle='--', linewidth=2, alpha=0.7)\n\n# Check if we have predictions\nif len(TIP) &gt; 0 and len(TSP2) &gt; 0:\n    # Plot predicted tides (TIP) - use TSP2 for time axis\n    ax.plot(TSP2, TIP, 'r', linewidth=1, label='Predicted tide (TIP)', alpha=0.8)\n    \n    # For observed water levels, plot the full time series\n    ax.plot(TSP, WLP, 'b', linewidth=1, label='Observed water level (WLP)', alpha=0.8)\n    \n    # For surge calculation, interpolate TIP to match TSP timestamps using pandas\n    # Find overlapping time period\n    mask_overlap = (TSP &gt;= TSP2[0]) & (TSP &lt;= TSP2[-1])\n    if np.any(mask_overlap):\n        TSP_overlap = TSP[mask_overlap]\n        WLP_overlap = WLP[mask_overlap]\n        # Use pandas for interpolation\n        df_tip = pd.Series(TIP, index=pd.DatetimeIndex(TSP2))\n        # Reindex to overlap timestamps and interpolate\n        tip_interp = df_tip.reindex(pd.DatetimeIndex(TSP_overlap), method='nearest', \n                                    tolerance=pd.Timedelta(minutes=15))\n        # Calculate surge where we have both values\n        valid_mask = ~tip_interp.isna()\n        if np.any(valid_mask):\n            surge = WLP_overlap[valid_mask] - tip_interp.values[valid_mask]\n            ax.plot(TSP_overlap[valid_mask], surge, 'g', \n                   linewidth=1, label='Surge (WLP - TIP)', alpha=0.8)\nelse:\n    # If no predictions, just plot observed water levels\n    print(\"Warning: No tidal predictions available. Plotting only observed water levels.\")\n    ax.plot(TSP, WLP, 'b', linewidth=1, label='Observed water level (WLP)', alpha=0.8)\n\n# Formatting\nax.grid(True, alpha=0.3)\nax.set_xlabel('Date', fontweight='bold', fontsize=16)\nax.set_ylabel('Level (m)', fontweight='bold', fontsize=16)\nax.set_ylim(-3, 4)\nax.legend(fontsize=14, loc='best')\nax.tick_params(labelsize=14)\n\nplt.tight_layout()\nplt.show()\n\n# Save figure\nfig_file = os.path.join(output_dir, 'master4_thames_predicted_high_waters.png')\nplt.savefig(fig_file, dpi=150, bbox_inches='tight')\nprint(f\"\\nFigure saved to {fig_file}\")\n\n\n\n\nPredicted high waters, observed water levels, and barrier closures for the Thames\n\n\n\n\n\nFigure saved to output/master4_thames_predicted_high_waters.png\n\n\n&lt;Figure size 672x480 with 0 Axes&gt;",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#part-1-barrier-closure-analysis",
-    "href": "thames.html#part-1-barrier-closure-analysis",
-    "title": "Thames Barrier",
-    "section": "Part 1: Barrier Closure Analysis",
-    "text": "Part 1: Barrier Closure Analysis\n\nTotal closures: Recorded across water years 1986/87 to 2024/25\nAnnual statistics: Minimum, mean, and maximum closures per water year\nTemporal patterns: Variability in closure frequency over time",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#part-2-tide-gauge-data-processing",
-    "href": "thames.html#part-2-tide-gauge-data-processing",
-    "title": "Thames Barrier",
-    "section": "Part 2: Tide Gauge Data Processing",
-    "text": "Part 2: Tide Gauge Data Processing\n\nCombined time series: 1986-2023 at 10-minute intervals\nData sources: Available Thames tide gauge measurements\nData quality: Percentage of valid data points across the time series",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#part-3-tidal-analysis",
-    "href": "thames.html#part-3-tidal-analysis",
-    "title": "Thames Barrier",
-    "section": "Part 3: Tidal Analysis",
-    "text": "Part 3: Tidal Analysis\n\nData quality: Calculated for each year to determine suitable reference years\nHarmonic analysis: Performed using pytides (Python equivalent of MATLAB’s t_tide)\nPredictions: Generated at 10-minute intervals for the entire period\nSurge calculation: The difference between observed and predicted water levels represents the non-tidal component (surge)",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "thames.html#part-4-visualization",
-    "href": "thames.html#part-4-visualization",
-    "title": "Thames Barrier",
-    "section": "Part 4: Visualization",
-    "text": "Part 4: Visualization\n\nClosure timing: When closures occurred relative to predicted high waters\nSurge contribution: The non-tidal component shows how much storm surge contributed to water levels\nTidal vs. meteorological effects: The difference between observed and predicted levels highlights meteorological forcing\n\nThe complete workflow provides a foundation for understanding barrier closure patterns, water level variability, and storm surge dynamics in the Thames estuary. The results can be used for further analysis of individual closure events, surge characteristics, and long-term trends.",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Thames"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html",
-    "href": "eastern_scheldt.html",
+    "objectID": "cloures.html",
+    "href": "cloures.html",
     "title": "Eastern Scheldt Barrier",
     "section": "",
-    "text": "This document provides a complete analysis workflow for the Eastern Scheldt barrier system, combining barrier closure analysis, tide gauge data processing, tidal analysis, and visualization. The analysis covers the period from 1986 to 2024 and includes:\n\nBarrier Closure Analysis: Loading and analyzing past barrier closure dates, counting closures per water year, and calculating statistics\nTide Gauge Data Processing: Loading and combining tide gauge data from multiple sources (OS4 and RPBU gauges)\nTidal Analysis: Performing harmonic tidal decomposition and generating predicted astronomical tides\nVisualization: Creating comprehensive visualizations showing predicted high waters, observed water levels, and barrier closures\n\nWater years run from July 1 to June 30, which is more appropriate for coastal flood analysis than calendar years.\n\n\nShared utilities and configuration loaded",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#analysis",
-    "href": "eastern_scheldt.html#analysis",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Analysis",
-    "text": "Analysis\n\n\nLoaded 31 closure datetimes\n  First closure: 1986-10-20 00:00:00\n  Last closure: 2023-12-21 00:00:00\n\nClosures per water year calculated for 39 years\n  Total closures: 31\n\nClosure statistics:\n  Min per year: 0.0\n  Mean per year: 0.79\n  Max per year: 4.0\n  Total: 31\n\nData saved to output/mast1.pkl",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#visualization",
-    "href": "eastern_scheldt.html#visualization",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Visualization",
-    "text": "Visualization\nThis bar chart shows the number of barrier closures per water year from 1986/87 to 2024/25. The Eastern Scheldt barrier closes when water levels exceed a threshold, typically during storm surge events.\n\n\n\n\n\nNumber of Eastern Scheldt barrier closures per water year (July 1 to June 30), 1986-2024\n\n\n\n\nThe following table lists all barrier closure dates, which correspond to storm events that triggered the Eastern Scheldt barrier.\n\n\n\nTotal number of closures: 31\n\n\n\n\n\n\nComplete list of Eastern Scheldt barrier closures (storm events), 1986-2024\n\n\n\nEvent\nClosure Date\nEnd Date\nWater Year\nYear\nMonth\n\n\n\n\n0\n1\n1986-10-20 00:00\nNone\n1986/87\n1986\nOctober\n\n\n1\n2\n1986-12-19 00:00\nNone\n1986/87\n1986\nDecember\n\n\n2\n2\n1986-12-19 00:00\nNone\n1986/87\n1986\nDecember\n\n\n3\n3\n1989-02-14 05:40\n1989-02-14 12:50\n1988/89\n1989\nFebruary\n\n\n4\n4\n1990-02-27 23:10\n1990-02-27 08:00\n1989/90\n1990\nFebruary\n\n\n5\n4\n1990-02-27 13:50\n1990-02-27 19:50\n1989/90\n1990\nFebruary\n\n\n6\n4\n1990-02-28 23:40\n1990-02-28 08:40\n1989/90\n1990\nFebruary\n\n\n7\n5\n1990-03-01 00:10\n1990-03-01 08:50\n1989/90\n1990\nMarch\n\n\n8\n6\n1990-09-21 12:00\n1990-09-21 20:00\n1990/91\n1990\nSeptember\n\n\n9\n7\n1990-12-12 05:40\n1990-12-12 16:50\n1990/91\n1990\nDecember\n\n\n10\n7\n1990-12-12 20:10\n1990-12-13 02:20\n1990/91\n1990\nDecember\n\n\n11\n8\n1992-11-11 13:40\n1992-11-11 17:30\n1992/93\n1992\nNovember\n\n\n12\n9\n1993-01-25 15:30\n1993-01-25 18:50\n1992/93\n1993\nJanuary\n\n\n13\n10\n1993-02-21 08:40\n1993-02-21 18:40\n1992/93\n1993\nFebruary\n\n\n14\n11\n1993-11-14 11:10\n1993-11-14 20:00\n1993/94\n1993\nNovember\n\n\n15\n11\n1993-11-15 00:40\n1993-11-15 06:20\n1993/94\n1993\nNovember\n\n\n16\n12\n1994-01-28 10:40\n1994-01-28 19:50\n1993/94\n1994\nJanuary\n\n\n17\n13\n1995-01-02 21:40\n1995-01-02 07:30\n1994/95\n1995\nJanuary\n\n\n18\n13\n1995-01-02 14:20\n1995-01-02 17:40\n1994/95\n1995\nJanuary\n\n\n19\n14\n1996-10-29 11:40\n1996-10-29 20:30\n1996/97\n1996\nOctober\n\n\n20\n15\n2002-10-27 14:30\n2002-10-27 22:50\n2002/03\n2002\nOctober\n\n\n21\n16\n2003-12-21 08:30\n2003-12-21 17:30\n2003/04\n2003\nDecember\n\n\n22\n17\n2004-02-08 13:20\n2004-02-08 21:00\n2003/04\n2004\nFebruary\n\n\n23\n18\n2007-11-09 22:40\n2007-11-09 09:10\n2007/08\n2007\nNovember\n\n\n24\n19\n2013-12-05 22:50\n2013-12-06 08:00\n2013/14\n2013\nDecember\n\n\n25\n20\n2014-10-21 22:30\n2014-10-22 06:00\n2014/15\n2014\nOctober\n\n\n26\n21\n2018-01-03 12:10\n2018-01-03 17:50\n2017/18\n2018\nJanuary\n\n\n27\n22\n2020-02-10 11:09\n2020-02-10 18:16\n2019/20\n2020\nFebruary\n\n\n28\n23\n2022-01-31 10:23\n2022-01-31 17:42\n2021/22\n2022\nJanuary\n\n\n29\n24\n2022-02-21 04:46\n2022-02-21 06:15\n2021/22\n2022\nFebruary\n\n\n30\n25\n2023-12-21 00:00\nNone\n2023/24\n2023\nDecember",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#tide-gauge-data-processing",
-    "href": "eastern_scheldt.html#tide-gauge-data-processing",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Tide Gauge Data Processing",
-    "text": "Tide Gauge Data Processing\nThis section loads and processes raw tide gauge data from the Eastern Scheldt. The analysis:\n\nLoads data from multiple tide gauge files (RPBU and OS4 gauges)\nCleans data by removing invalid values\nCombines time series from different gauges to create a continuous record\nCreates a visualization of the complete water level time series\n\nThe combined time series spans from 1986 to 2023, using OS4 gauge data for the early period (1986-1987) and RPBU gauge data for the main period (1987-2023).\n\n\nData directory: ../2_DATA\nOutput directory: output\n\n\n\nLoad RPBU 1987-2022 Data\nLoad the main tide gauge dataset from the RPBU gauge covering April 1987 to December 2022.\n\n\nLoaded RPBU 1987-2022: 1,878,480 data points\n  Start: 1987-04-15 00:00:00\n  End: 2022-12-31 23:50:00\n  Valid data: 1,876,721 points (99.9%)\n\n\n\n\nLoad RPBU 2023 Data\nLoad the 2023 data from the RPBU gauge to extend the time series.\n\n\nLoaded RPBU 2023: 52,560 data points\n  Start: 2023-01-01 00:00:00\n  End: 2023-12-31 23:50:00\n  Valid data: 52,560 points (100.0%)\n\n\n\n\nLoad OS4 1982-2023 Data\nLoad data from the OS4 gauge, which provides coverage for the early period before RPBU data begins.\n\n\nLoaded OS4 1982-2023: 2,208,960 data points\n  Start: 1982-01-01 00:00:00\n  End: 2023-12-31 23:50:00\n  Valid data: 2,161,485 points (97.9%)\n\n\n\n\nCombine Time Series\nCombine the time series from different gauges to create a continuous record. Use OS4 data for the early period (1986-1987) before RPBU starts, then switch to RPBU data for the main period.\n\n\n\nCombined time series: 1,998,576 data points\n  Start: 1986-01-01 00:00:00\n  End: 2023-12-31 23:50:00\n  Valid data: 1,996,699 points (99.9%)\n  Time span: 13878 days\n\n\nSave the combined time series to a pickle file for use in subsequent analyses.\n\n\n\nData saved to output/mast2.pkl\n\n\n\n\nVisualization\nThis figure shows the combined tide gauge water level time series from 1986 to 2023 at 10-minute intervals. The data combines OS4 gauge measurements (1986-1987) and RPBU gauge measurements (1987-2023) for the Eastern Scheldt. Water levels are shown in meters relative to NAP (Normal Amsterdam Peil, the Dutch reference datum). The time series shows tidal variations, storm surges, and long-term water level patterns over the 38-year period.\n\n\n\n\n\nCombined tide gauge water level time series for the Eastern Scheldt, 1986-2023. Data combines OS4 gauge (1986-1987) and RPBU gauge (1987-2023) measurements at 10-minute intervals.",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#tidal-analysis",
-    "href": "eastern_scheldt.html#tidal-analysis",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Tidal Analysis",
-    "text": "Tidal Analysis\nThis section performs harmonic tidal analysis on tide gauge data from the Eastern Scheldt. The analysis:\n\nCalculates data quality for each year (1986-2023)\nPerforms harmonic tidal decomposition using pytides (replacing MATLAB’s t_tide)\nGenerates tidal predictions for all years\nCompares observed water levels with predicted astronomical tides\n\nThe predicted tides represent only the astronomical component, while observed water levels include both tides and meteorological effects (storm surges, wind setup, etc.).\n\nSetup and Configuration\n\n\nAnalysis configuration:\n  Years: 1986 to 2023 (38 years)\n  Data quality threshold: 60%\n  Latitude: 51.64°\n\n\n\n\nLoad Tide Gauge Data\n\n\nLoading tide gauge data...\nLoaded 1,998,576 data points\n  Start: 1986-01-01 00:00:00\n  End: 2023-12-31 23:50:00\n  Valid data: 1,996,699 points (99.9%)\n\n\n\n\nCalculate Data Quality Per Year\n\n\n\nCalculating data quality per year...\n\nData quality summary:\n  Range: 98.8% to 100.0%\n  Mean: 99.9%\n  Years with quality &gt;= 60%: 38/38\n\n\n\n\nTidal Analysis and Prediction\nFor each target year, the analysis determines a reference year, extracts data, performs harmonic decomposition, and generates predictions.\n\n\n\nLoading existing tidal analysis results...\nLoaded existing results:\n  Total predictions: 1,998,576 points\n  Start: 1986-01-01 00:00:00\n  End: 2023-12-31 23:50:00\n\n\n\n\nData saved to output/mast3.pkl\n\n\n\n\nVisualization\nThis figure compares observed water levels (blue) with predicted astronomical tides (red) from harmonic analysis. The predicted tides represent the astronomical component only, while observed water levels include both tides and meteorological effects.\n\n\n\n\n\nComparison of observed water levels (blue) and predicted astronomical tides (red) for the Eastern Scheldt, 1986-2023",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#predicted-high-waters-and-barrier-closures",
-    "href": "eastern_scheldt.html#predicted-high-waters-and-barrier-closures",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Predicted High Waters and Barrier Closures",
-    "text": "Predicted High Waters and Barrier Closures\nThis section plots time-series of predicted high waters and barrier closures for the Eastern Scheldt. The analysis:\n\nLoads barrier closure dates and tide gauge data from previous analyses\nCreates a visualization showing:\n\nBarrier closure dates as vertical dashed lines\nPredicted astronomical tides (TIP)\nObserved water levels (WLP)\nThe difference between observed and predicted levels (surge component)\n\n\nThis visualization helps identify when barrier closures occurred relative to predicted high waters and actual water levels.\n\n\nLoading data...\n\nData loaded:\n  Closure dates: 31 closures\n    First closure: 1986-10-20 00:00:00\n    Last closure: 2023-12-21 00:00:00\n  End dates available: 27 closures\n  Time series points: 1,998,576\n  Predicted tides: 1,998,576\n  Observed water levels: 1,998,576\n\n\n\nVisualization\nThis figure shows predicted astronomical tides (red), observed water levels (blue), the difference between them (green), and barrier closure dates (vertical dashed magenta lines). The difference (WLP-TIP) represents the non-tidal component, primarily storm surge.\n\n\n\n\n\nPredicted high waters, observed water levels, and barrier closures for the Eastern Scheldt",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#storm-1",
-    "href": "eastern_scheldt.html#storm-1",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Storm 1",
-    "text": "Storm 1\n\nWater Level and Surge Analysis\n\n\n\n\n\nPredicted high waters, observed water levels, and barrier closure (zoomed view) for Storm 1 - Eastern Scheldt\n\n\n\n\n\n\n\n\n\nWater level and surge time series for Storm 1 closure event\n\n\n\n\n\n\nSpatial Surge and Meteorological Maps\n\n\n\n\n\nGTSM reanalysis surge maps at 6 time steps around Storm 1 closure event\n\n\n\n\n\n\n\n\n\n\nFigure 1: ERA5 reanalysis pressure and wind fields animation around Storm 1 closure event",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#storm-2",
-    "href": "eastern_scheldt.html#storm-2",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Storm 2",
-    "text": "Storm 2\n\nWater Level and Surge Analysis\n\n\n\n\n\nPredicted high waters, observed water levels, and barrier closure (zoomed view) for Storm 2 - Eastern Scheldt\n\n\n\n\n\n\n\n\n\nWater level and surge time series for Storm 2 closure event\n\n\n\n\n\n\nSpatial Surge and Meteorological Maps\n\n\n\n\n\nGTSM reanalysis surge maps at 6 time steps around Storm 2 closure event\n\n\n\n\n\n\n\n\n\n\nFigure 2: ERA5 reanalysis pressure and wind fields animation around Storm 2 closure event",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#storm-3",
-    "href": "eastern_scheldt.html#storm-3",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Storm 3",
-    "text": "Storm 3\n\nWater Level and Surge Analysis\n\n\n\n\n\nPredicted high waters, observed water levels, and barrier closure (zoomed view) for Storm 3 - Eastern Scheldt\n\n\n\n\n\n\n\n\n\nWater level and surge time series for Storm 3 closure event\n\n\n\n\n\n\nSpatial Surge and Meteorological Maps\n\n\n\n\n\nGTSM reanalysis surge maps at 6 time steps around Storm 3 closure event\n\n\n\n\n\n\n\n\n\n\nFigure 3: ERA5 reanalysis pressure and wind fields animation around Storm 3 closure event",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#storm-5",
-    "href": "eastern_scheldt.html#storm-5",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Storm 5",
-    "text": "Storm 5\n\nWater Level and Surge Analysis\n\n\n\n\n\nPredicted high waters, observed water levels, and barrier closure (zoomed view) for Storm 5 - Eastern Scheldt\n\n\n\n\n\n\n\n\n\nWater level and surge time series for Storm 5 closure event\n\n\n\n\n\n\nSpatial Surge and Meteorological Maps\n\n\n\n\n\nGTSM reanalysis surge maps at 6 time steps around Storm 5 closure event\n\n\n\n\n\n\n\n\n\n\nFigure 4: ERA5 reanalysis pressure and wind fields animation around Storm 5 closure event",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#storm-6",
-    "href": "eastern_scheldt.html#storm-6",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Storm 6",
-    "text": "Storm 6\n\nWater Level and Surge Analysis\n\n\n\n\n\nPredicted high waters, observed water levels, and barrier closure (zoomed view) for Storm 6 - Eastern Scheldt\n\n\n\n\n\n\n\n\n\nWater level and surge time series for Storm 6 closure event\n\n\n\n\n\n\nSpatial Surge and Meteorological Maps\n\n\n\n\n\nGTSM reanalysis surge maps at 6 time steps around Storm 6 closure event\n\n\n\n\n\n\n\n\n\n\nFigure 5: ERA5 reanalysis pressure and wind fields animation around Storm 6 closure event",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#storm-7",
-    "href": "eastern_scheldt.html#storm-7",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Storm 7",
-    "text": "Storm 7\n\nWater Level and Surge Analysis\n\n\n\n\n\nPredicted high waters, observed water levels, and barrier closure (zoomed view) for Storm 7 - Eastern Scheldt\n\n\n\n\n\n\n\n\n\nWater level and surge time series for Storm 7 closure event\n\n\n\n\n\n\nSpatial Surge Maps\n\n\n\n\n\nGTSM reanalysis surge maps at 6 time steps around Storm 7 closure event",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#storm-8",
-    "href": "eastern_scheldt.html#storm-8",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Storm 8",
-    "text": "Storm 8\n\nWater Level and Surge Analysis\n\n\n\n\n\nPredicted high waters, observed water levels, and barrier closure (zoomed view) for Storm 8 - Eastern Scheldt\n\n\n\n\n\n\n\n\n\nWater level and surge time series for Storm 8 closure event\n\n\n\n\n\n\nSpatial Surge and Meteorological Maps\n\n\n\n\n\nGTSM reanalysis surge maps at 6 time steps around Storm 8 closure event\n\n\n\n\n\n\n\n\n\n\nFigure 6: ERA5 reanalysis pressure and wind fields animation around Storm 8 closure event",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#storm-9",
-    "href": "eastern_scheldt.html#storm-9",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Storm 9",
-    "text": "Storm 9\n\nWater Level and Surge Analysis\n\n\n\n\n\nPredicted high waters, observed water levels, and barrier closure (zoomed view) for Storm 9 - Eastern Scheldt\n\n\n\n\n\n\n\n\n\nWater level and surge time series for Storm 9 closure event\n\n\n\n\n\n\nSpatial Surge Maps\n\n\n\n\n\nGTSM reanalysis surge maps at 6 time steps around Storm 9 closure event",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#storm-10",
-    "href": "eastern_scheldt.html#storm-10",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Storm 10",
-    "text": "Storm 10\n\nWater Level and Surge Analysis\n\n\n\n\n\nPredicted high waters, observed water levels, and barrier closure (zoomed view) for Storm 10 - Eastern Scheldt\n\n\n\n\n\n\n\n\n\nWater level and surge time series for Storm 10 closure event\n\n\n\n\n\n\nSpatial Surge Maps\n\n\n\n\n\nGTSM reanalysis surge maps at 6 time steps around Storm 10 closure event",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#storm-11",
-    "href": "eastern_scheldt.html#storm-11",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Storm 11",
-    "text": "Storm 11\n\nWater Level and Surge Analysis\n\n\n\n\n\nPredicted high waters, observed water levels, and barrier closure (zoomed view) for Storm 11 - Eastern Scheldt\n\n\n\n\n\n\n\n\n\nWater level and surge time series for Storm 11 closure event\n\n\n\n\n\n\nSpatial Surge Maps\n\n\n\n\n\nGTSM reanalysis surge maps at 6 time steps around Storm 11 closure event",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#storm-12",
-    "href": "eastern_scheldt.html#storm-12",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Storm 12",
-    "text": "Storm 12\n\nWater Level and Surge Analysis\n\n\n\n\n\nPredicted high waters, observed water levels, and barrier closure (zoomed view) for Storm 12 - Eastern Scheldt\n\n\n\n\n\n\n\n\n\nWater level and surge time series for Storm 12 closure event\n\n\n\n\n\n\nSpatial Surge Maps\n\n\n\n\n\nGTSM reanalysis surge maps at 6 time steps around Storm 12 closure event",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#storm-13",
-    "href": "eastern_scheldt.html#storm-13",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Storm 13",
-    "text": "Storm 13\n\nWater Level and Surge Analysis\n\n\n\n\n\nPredicted high waters, observed water levels, and barrier closure (zoomed view) for Storm 13 - Eastern Scheldt\n\n\n\n\n\n\n\n\n\nWater level and surge time series for Storm 13 closure event\n\n\n\n\n\n\nSpatial Surge Maps\n\n\n\n\n\nGTSM reanalysis surge maps at 6 time steps around Storm 13 closure event",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#storm-18",
-    "href": "eastern_scheldt.html#storm-18",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Storm 18",
-    "text": "Storm 18\n\nWater Level and Surge Analysis\n\n\n\n\n\nPredicted high waters, observed water levels, and barrier closure (zoomed view) for Storm 18 - Eastern Scheldt\n\n\n\n\n\n\n\n\n\nWater level and surge time series for Storm 18 closure event\n\n\n\n\n\n\nSpatial Surge and Meteorological Maps\n\n\n\n\n\nGTSM reanalysis surge maps at 6 time steps around Storm 18 closure event\n\n\n\n\n\n\n\n\n\n\nFigure 7: ERA5 reanalysis pressure and wind fields animation around Storm 18 closure event",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
-  },
-  {
-    "objectID": "eastern_scheldt.html#storm-19",
-    "href": "eastern_scheldt.html#storm-19",
-    "title": "Eastern Scheldt Barrier",
-    "section": "Storm 19",
-    "text": "Storm 19\n\nWater emaLevel and Surge Analysis\n\n\n\n\n\nPredicted high waters, observed water levels, and barrier closure (zoomed view) for Storm 19 - Eastern Scheldt\n\n\n\n\n\n\n\n\n\nWater level and surge time series for Storm 19 closure event\n\n\n\n\n\n\nSpatial Surge and Meteorological Maps\n\n\n\n\n\nGTSM reanalysis surge maps at 6 time steps around Storm 19 closure event\n\n\n\n\n\n\n\n\n\n\nFigure 8: ERA5 reanalysis pressure and wind fields animation around Storm 19 closure event\n\n\n\n```",
-    "crumbs": [
-      "Eastern Scheldt Barrier",
-      "Eastern Scheldt"
-    ]
+    "text": "Barrier Closures\n\n\nAnalysis configuration:\n  Water years: 1986/87 to 2024/25 (39 years)\n\n\n\n\n\nClosures per water year calculated for 39 years\n  Total closures: 31\n  Min per year: 0.0\n  Mean per year: 0.79\n  Max per year: 4.0\n\n\n\n\n\nNumber of Eastern Scheldt barrier closures per water year (July 1 to June 30), 1986-2024\n\n\n\n\n    Storm    Start of Closure      End of Closure Water Year\n0       1 1986-10-20 12:00:00 1986-10-21 00:00:00    1986/87\n1       2 1986-12-19 12:00:00 1986-12-20 00:00:00    1986/87\n2       2 1986-12-19 12:00:00 1986-12-20 00:00:00    1986/87\n3       3 1989-02-14 05:40:00 1989-02-14 12:50:00    1988/89\n4       4 1990-02-26 23:10:00 1990-02-27 08:00:00    1989/90\n5       4 1990-02-27 13:50:00 1990-02-27 19:50:00    1989/90\n6       4 1990-02-27 23:40:00 1990-02-28 08:40:00    1989/90\n7       5 1990-03-01 00:10:00 1990-03-01 08:50:00    1989/90\n8       6 1990-09-21 12:00:00 1990-09-21 20:00:00    1990/91\n9       7 1990-12-12 05:40:00 1990-12-12 16:50:00    1990/91\n10      7 1990-12-12 20:10:00 1990-12-13 02:20:00    1990/91\n11      8 1992-11-11 13:40:00 1992-11-11 17:30:00    1992/93\n12      9 1993-01-25 15:30:00 1993-01-25 18:50:00    1992/93\n13     10 1993-02-21 08:40:00 1993-02-21 18:40:00    1992/93\n14     11 1993-11-14 11:10:00 1993-11-14 20:00:00    1993/94\n15     11 1993-11-15 00:40:00 1993-11-15 06:20:00    1993/94\n16     12 1994-01-28 10:40:00 1994-01-28 19:50:00    1993/94\n17     13 1995-01-01 21:40:00 1995-01-02 07:30:00    1994/95\n18     13 1995-01-02 14:20:00 1995-01-02 17:40:00    1994/95\n19     14 1996-10-29 11:40:00 1996-10-29 20:30:00    1996/97\n20     15 2002-10-27 14:30:00 2002-10-27 22:50:00    2002/03\n21     16 2003-12-21 08:30:00 2003-12-21 17:30:00    2003/04\n22     17 2004-02-08 13:20:00 2004-02-08 21:00:00    2003/04\n23     18 2007-11-08 22:40:00 2007-11-09 09:10:00    2007/08\n24     19 2013-12-05 22:50:00 2013-12-06 08:00:00    2013/14\n25     20 2014-10-21 22:30:00 2014-10-22 06:00:00    2014/15\n26     21 2018-01-03 12:10:00 2018-01-03 17:50:00    2017/18\n27     22 2020-02-10 11:09:00 2020-02-10 18:16:00    2019/20\n28     23 2022-01-31 10:23:00 2022-01-31 17:42:00    2021/22\n29     24 2022-02-21 04:46:00 2022-02-21 06:15:00    2021/22\n30     25 2023-12-21 12:00:00 2023-12-22 00:00:00    2023/24\n\n\n\n\nObserved Water Level Time Series\nLoad the main tide gauge dataset from the RPBU gauge covering April 1987 to December 2022.\n\n\nLoaded RPBU 1987-2022: 1,878,480 data points\n  Start: 1987-04-15 00:00:00\n  End: 2022-12-31 23:50:00\n  Valid data: 1,876,721 points (99.9%)\n\n\nLoad the 2023 data from the RPBU gauge to extend the time series.\n\n\nLoaded RPBU 2023: 52,560 data points\n  Start: 2023-01-01 00:00:00\n  End: 2023-12-31 23:50:00\n  Valid data: 52,560 points (100.0%)\n\n\nLoad data from the OS4 gauge, which provides coverage for the early period before RPBU data begins.\n\n\nLoaded OS4 1982-2023: 2,208,960 data points\n  Start: 1982-01-01 00:00:00\n  End: 2023-12-31 23:50:00\n  Valid data: 2,161,485 points (97.9%)\n\n\nCombine the time series from different gauges to create a continuous record. Use OS4 data for the early period (1986-1987) before RPBU starts, then switch to RPBU data for the main period.\n\n\n\nCombined time series: 1,998,576 data points\n  Start: 1986-01-01 00:00:00\n  End: 2023-12-31 23:50:00\n  Valid data: 1,996,699 points (99.9%)\n  Time span: 13878 days\n\n\n\n\n\n\n\nCombined tide gauge water level time series for the Eastern Scheldt, 1986-2023. Data combines OS4 gauge (1986-1987) and RPBU gauge (1987-2023) measurements at 10-minute intervals.\n\n\n\n\n\n\nTidal Harmonic Analysis\n\n\nAnalysis configuration:\n  Years: 1986 to 2023 (38 years)\n  Data quality threshold: 60%\n  Latitude: 51.64°\n\n\n\n\nLoaded 1,998,576 data points\n  Start: 1986-01-01 00:00:00\n  End: 2023-12-31 23:50:00\n  Valid data: 1,996,699 points (99.9%)\n\n\n\n\n\nCalculating data quality per year...\n\nData quality summary:\n  Range: 98.8% to 100.0%\n  Mean: 99.9%\n  Years with quality &gt;= 60%: 38/38\n\n\n\n\n\nLoading existing tidal analysis results...\nLoaded existing results:\n  Total predictions: 1,998,576 points\n  Start: 1986-01-01 00:00:00\n  End: 2023-12-31 23:50:00\n\n\nThis figure compares observed water levels (blue) with predicted astronomical tides (red) from harmonic analysis. The predicted tides represent the astronomical component only, while observed water levels include both tides and meteorological effects.\n\n\n\n\n\nComparison of observed water levels (blue) and predicted astronomical tides (red) for the Eastern Scheldt, 1986-2023\n\n\n\n\n\n\n    Storm    Start of Closure      End of Closure  Max WL         Max WL Time  \\\n0       1 1986-10-20 12:00:00 1986-10-21 00:00:00    2.94 1986-10-20 14:30:00   \n1       2 1986-12-19 12:00:00 1986-12-20 00:00:00    2.61 1986-12-19 15:10:00   \n2       2 1986-12-19 12:00:00 1986-12-20 00:00:00    2.61 1986-12-19 15:10:00   \n3       3 1989-02-14 05:40:00 1989-02-14 12:50:00    3.14 1989-02-14 08:10:00   \n4       4 1990-02-26 23:10:00 1990-02-27 08:00:00    3.11 1990-02-27 02:40:00   \n5       4 1990-02-27 13:50:00 1990-02-27 19:50:00    3.61 1990-02-27 15:00:00   \n6       4 1990-02-27 23:40:00 1990-02-28 08:40:00    3.25 1990-02-28 03:20:00   \n7       5 1990-03-01 00:10:00 1990-03-01 08:50:00    3.35 1990-03-01 03:50:00   \n8       6 1990-09-21 12:00:00 1990-09-21 20:00:00    2.92 1990-09-21 15:10:00   \n9       7 1990-12-12 05:40:00 1990-12-12 16:50:00    2.80 1990-12-12 10:40:00   \n10      7 1990-12-12 20:10:00 1990-12-13 02:20:00    2.65 1990-12-12 23:00:00   \n11      8 1992-11-11 13:40:00 1992-11-11 17:30:00    3.15 1992-11-11 14:40:00   \n12      9 1993-01-25 15:30:00 1993-01-25 18:50:00    3.25 1993-01-25 16:20:00   \n13     10 1993-02-21 08:40:00 1993-02-21 18:40:00    3.13 1993-02-21 14:20:00   \n14     11 1993-11-14 11:10:00 1993-11-14 20:00:00    3.35 1993-11-14 13:20:00   \n15     11 1993-11-15 00:40:00 1993-11-15 06:20:00    3.36 1993-11-15 02:00:00   \n16     12 1994-01-28 10:40:00 1994-01-28 19:50:00    3.49 1994-01-28 14:30:00   \n17     13 1995-01-01 21:40:00 1995-01-02 07:30:00    3.37 1995-01-02 02:10:00   \n18     13 1995-01-02 14:20:00 1995-01-02 17:40:00    3.07 1995-01-02 14:50:00   \n19     14 1996-10-29 11:40:00 1996-10-29 20:30:00    3.16 1996-10-29 15:20:00   \n20     15 2002-10-27 14:30:00 2002-10-27 22:50:00    2.49 2002-10-27 17:00:00   \n21     16 2003-12-21 08:30:00 2003-12-21 17:30:00    3.19 2003-12-21 12:30:00   \n22     17 2004-02-08 13:20:00 2004-02-08 21:00:00    2.94 2004-02-08 15:10:00   \n23     18 2007-11-08 22:40:00 2007-11-09 09:10:00    3.43 2007-11-09 01:10:00   \n24     19 2013-12-05 22:50:00 2013-12-06 08:00:00    3.63 2013-12-06 03:40:00   \n25     20 2014-10-21 22:30:00 2014-10-22 06:00:00    3.20 2014-10-22 00:50:00   \n26     21 2018-01-03 12:10:00 2018-01-03 17:50:00    3.01 2018-01-03 14:00:00   \n27     22 2020-02-10 11:09:00 2020-02-10 18:16:00    3.11 2020-02-10 14:10:00   \n28     23 2022-01-31 10:23:00 2022-01-31 17:42:00    3.24 2022-01-31 13:20:00   \n29     24 2022-02-21 04:46:00 2022-02-21 06:15:00    3.11 2022-02-21 05:20:00   \n30     25 2023-12-21 12:00:00 2023-12-22 00:00:00    3.27 2023-12-21 21:00:00   \n\n    Pred Tide @ Max  Surge @ Max  \n0          1.129013     1.810987  \n1          1.288876     1.321124  \n2          1.288876     1.321124  \n3          1.505884     1.634116  \n4          1.714849     1.395151  \n5          1.754419     1.855581  \n6          1.822307     1.427693  \n7          1.720589     1.629411  \n8          1.767947     1.152053  \n9          1.051664     1.748336  \n10         1.136948     1.513052  \n11         1.731186     1.418814  \n12         1.729342     1.520658  \n13         1.621703     1.508297  \n14         1.514953     1.835047  \n15         1.627986     1.732014  \n16         1.717153     1.772847  \n17         1.748693     1.621307  \n18         1.954873     1.115127  \n19         1.627758     1.532242  \n20         1.286913     1.203087  \n21         1.464645     1.725355  \n22         1.599734     1.340266  \n23         1.598775     1.831225  \n24         1.793586     1.836414  \n25         1.574673     1.625327  \n26         1.492736     1.517264  \n27         1.517694     1.592306  \n28         1.795375     1.444625  \n29         1.966079     1.143921  \n30         1.434981     1.835019  \n\n\n\n\nSaved data to output/mast1.pkl\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPredicted high waters, observed water levels, and barrier closures for the Eastern Scheldt"
   }
 ]

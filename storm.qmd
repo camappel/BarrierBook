@@ -1,0 +1,802 @@
+---
+title: "Storm Analysis"
+params:
+  run_all: true
+  storm_index: 0
+format: html
+execute:
+  echo: false
+  warnings: false
+---
+
+# Storm Analysis
+
+This document analyzes storm events (all 25 storms / 31 closures in `storm_df`), including:
+1. **Water Level and Surge Charts**: Time series of observed water levels, predicted tides, and surge
+2. **ERA5 Data Download**: Downloads meteorological reanalysis data for the storm period
+3. **Meteorological Map GIF**: Creates an animated visualization of pressure fields and wind vectors
+
+## Setup
+
+```{python}
+#| label: setup
+#| include: true
+
+import os
+import sys
+import pickle
+from datetime import datetime, timedelta
+from io import BytesIO
+from typing import Optional
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+import xarray as xr
+import imageio.v2 as imageio_v2
+import imageio
+import cdsapi
+from IPython.display import Markdown, display
+
+# =========================
+# Quarto params handling
+# =========================
+try:
+    params
+except NameError:
+    params = {"run_all": True, "storm_index": 0}
+
+run_all = bool(params.get("run_all", True))
+storm_index = int(params.get("storm_index", 0))
+
+print(f"Params: run_all={run_all}, storm_index={storm_index}")
+
+# =========================
+# Directories
+# =========================
+output_dir = "output"
+data_dir = "../2_DATA"
+gif_output_dir = os.path.join(output_dir, "storm_era5_meteorology_gifs")
+water_level_dir = os.path.join(output_dir, "water_level_plots")
+gtsm_gif_dir = os.path.join(output_dir, "storm_gtsm_surge_gifs")
+
+for d in [output_dir, gif_output_dir, water_level_dir, gtsm_gif_dir]:
+    os.makedirs(d, exist_ok=True)
+
+# =========================
+# Shared parameters
+# =========================
+hours_before = 18
+hours_after = 60
+int_skip = 3
+GIF_FPS = 4  # Same FPS for ERA5 and GTSM GIFs so they stay in sync when shown side-by-side
+
+XB_MET = [-30, 15]
+YB_MET = [40, 70]
+XB_GTSM = [-10, 10]
+YB_GTSM = [45, 60]
+
+BARRIER_LON, BARRIER_LAT = 3.68, 51.64
+codec_dir = "../2_DATA/3_CODEC_GTSM_API"
+era5_dir = "../2_DATA/4_ERA5_API"
+
+os.makedirs(codec_dir, exist_ok=True)
+os.makedirs(era5_dir, exist_ok=True)
+```
+
+```{python}
+#| label: helper-functions
+
+def setup_map(ax, xb, yb):
+    ax.add_feature(cfeature.COASTLINE.with_scale("50m"), linewidth=0.8, color="white")
+    ax.add_feature(cfeature.BORDERS.with_scale("50m"), linewidth=0.5, color="white")
+    ax.add_feature(cfeature.LAND.with_scale("50m"), facecolor="lightgray", alpha=0.3)
+    ax.set_xlim(xb)
+    ax.set_ylim(yb)
+    ax.gridlines(draw_labels=True, linewidth=0.5, color="gray", alpha=0.5, linestyle="--")
+
+
+def open_ds(path):
+    try:
+        return xr.open_dataset(path, engine="netcdf4")
+    except Exception:
+        return xr.open_dataset(path)
+
+
+def write_gif_stream(path, frame_iter, fps):
+    with imageio.get_writer(path, mode="I", fps=fps, loop=0) as writer:
+        for frame in frame_iter:
+            writer.append_data(frame)
+
+
+def get_codec_nc_path(codec_dir, closure_date):
+    import zipfile
+
+    year, month = closure_date.year, closure_date.month
+    raw_path = os.path.join(codec_dir, f"GTSM_{year}_{month:02d}.nc")
+    if not os.path.exists(raw_path):
+        return None
+
+    with open(raw_path, "rb") as f:
+        magic = f.read(4)
+
+    if magic != b"PK\x03\x04":
+        return raw_path
+
+    extract_dir = os.path.join(codec_dir, f"GTSM_{year}_{month:02d}_extracted")
+    marker = os.path.join(extract_dir, ".extracted_ok")
+
+    if not os.path.exists(marker):
+        os.makedirs(extract_dir, exist_ok=True)
+        with zipfile.ZipFile(raw_path, "r") as z:
+            z.extractall(extract_dir)
+        with open(marker, "w") as f:
+            f.write("ok")
+
+    for root, _, files in os.walk(extract_dir):
+        for fn in files:
+            if fn.endswith(".nc"):
+                return os.path.join(root, fn)
+    return None
+```
+
+
+```{python}
+#| label: load-storm-data
+#| include: true
+
+with open("output/mast1.pkl", "rb") as f:
+    mast1_data = pickle.load(f)
+
+TSP = mast1_data["TSP"]
+TIP = mast1_data["TIP"]
+WLP = mast1_data["WLP"]
+SUP = mast1_data["SUP"]
+storm_df = mast1_data["storm_df"]
+
+storm_ids = sorted(storm_df["Storm"].unique())
+
+if run_all:
+    storm_ids_to_process = storm_ids
+else:
+    storm_ids_to_process = [storm_ids[storm_index]]
+
+print(f"Storms to process: {storm_ids_to_process}")
+
+```
+
+# Meteorological Plots (ERA5)
+
+```{python}
+#| label: era5-download-helper
+#| include: true
+
+client = cdsapi.Client()
+
+for storm_id in storm_ids_to_process:
+    group = storm_df[storm_df["Storm"] == storm_id]
+    storm_start = group["Start of Closure"].min()
+    storm_end = group["End of Closure"].fillna(
+        group["Start of Closure"] + pd.Timedelta(days=1)
+    ).max()
+
+    start_date = storm_start - timedelta(hours=24)
+    end_date = storm_end + timedelta(hours=24)
+
+    era5_filename = f"ERA5_{storm_id}_{start_date:%Y%m%d}_{end_date:%Y%m%d}.nc"
+    era5_file = os.path.join(era5_dir, era5_filename)
+
+    if os.path.exists(era5_file):
+        continue
+
+    request = {
+        "product_type": "reanalysis",
+        "variable": ["mean_sea_level_pressure", "10m_u_component_of_wind", "10m_v_component_of_wind"],
+        "year": [str(start_date.year)],
+        "month": [f"{start_date.month:02d}"],
+        "day": [f"{d:02d}" for d in range(1, 32)],
+        "time": [f"{h:02d}:00" for h in range(24)],
+        "area": [YB_MET[1], XB_MET[0], YB_MET[0], XB_MET[1]],
+        "format": "netcdf",
+    }
+
+    client.retrieve("reanalysis-era5-single-levels", request).download(era5_file)
+    print(f"Downloaded {era5_filename}")
+```
+
+Download ERA5 data using the API (one file per storm).
+
+```{python}
+#| label: download-era5-data
+#| include: true
+
+era5_dir = '../2_DATA/4_ERA5_API'
+os.makedirs(era5_dir, exist_ok=True)
+
+for storm_id in storm_ids_to_process:
+    group = storm_df[storm_df['Storm'] == storm_id]
+    storm_start = group['Start of Closure'].min()
+    storm_end = group['End of Closure'].fillna(group['Start of Closure'] + pd.Timedelta(days=1)).max()
+
+    start_date = storm_start - timedelta(hours=24)
+    end_date = storm_end + timedelta(hours=24)
+    era5_filename = f"ERA5_{storm_id}_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.nc"
+    era5_file = os.path.join(era5_dir, era5_filename)
+
+    if os.path.exists(era5_file):
+        print(f"[Storm {storm_id}] ERA5 exists: {era5_filename}")
+    else:
+        print(f"[Storm {storm_id}] ⚠ ERA5 file not found: {era5_filename} (run era5-download-helper chunk to download via CDS API)")
+print("ERA5 download pass complete.")
+```
+
+# GTSM Plots (CODEC)
+
+Download CODEC GTSM data for each unique year-month across all storms (each month downloaded once).
+
+```{python}
+#| label: download-codec-gtsm
+#| include: true
+
+import cdsapi
+import zipfile
+
+dataset = "sis-water-level-change-timeseries-cmip6"
+codec_dir = '../2_DATA/3_CODEC_GTSM_API'
+os.makedirs(codec_dir, exist_ok=True)
+
+# Unique (year, month) from all storms
+ym_pairs = storm_df[['Start of Closure']].apply(
+    lambda r: (r['Start of Closure'].year, r['Start of Closure'].month), axis=1
+).drop_duplicates().tolist()
+
+for year, month in ym_pairs:
+    year_s, month_s = str(year), f"{month:02d}"
+    codec_filepath = os.path.join(codec_dir, f"GTSM_{year_s}_{month_s}.nc")
+
+    if not os.path.exists(codec_filepath):
+        request = {
+            "variable": ["storm_surge_residual"],
+            "experiment": "reanalysis",
+            "temporal_aggregation": ["10_min"],
+            "year": [year_s],
+            "month": [month_s],
+            "version": ["v3"]
+        }
+        client = cdsapi.Client()
+        client.retrieve(dataset, request).download(target=codec_filepath)
+        print(f"✓ Downloaded: {codec_filepath}")
+    else:
+        print(f"Exists: GTSM_{year_s}_{month_s}.nc")
+
+    with open(codec_filepath, 'rb') as f:
+        if f.read(4) == b'PK\x03\x04':
+            extract_dir = os.path.join(codec_dir, f"GTSM_{year_s}_{month_s}_extracted")
+            os.makedirs(extract_dir, exist_ok=True)
+            with zipfile.ZipFile(codec_filepath, 'r') as z:
+                z.extractall(extract_dir)
+            names = os.listdir(extract_dir)
+            nc_files = [n for n in names if n.endswith('.nc')]
+            print(f"  Extracted → {nc_files[0] if nc_files else names[0]}")
+print("CODEC GTSM download pass complete.")
+```
+
+## Inspect downloaded CODEC GTSM file
+
+```{python}
+#| label: inspect-codec-gtsm-file
+#| include: true
+
+# Inspect first storm's month as example
+if storm_ids_to_process:
+    closure_date = storm_df[storm_df['Storm'] == storm_ids_to_process[0]].iloc[0]['Start of Closure']
+    codec_nc_path = get_codec_nc_path(codec_dir, closure_date)
+    raw_path = os.path.join(codec_dir, f"GTSM_{closure_date.year}_{closure_date.month:02d}.nc")
+    if not os.path.exists(raw_path):
+        print(f"No file at {raw_path}. Run the download cell first.")
+    elif codec_nc_path is None:
+        print("Could not get openable path.")
+    else:
+        size = os.path.getsize(raw_path)
+        with open(raw_path, 'rb') as f:
+            magic = f.read(4)
+        print(f"Example file: {raw_path}")
+        print(f"Size: {size:,} bytes ({size / 1024 / 1024:.2f} MB)")
+        if magic == b'PK\x03\x04':
+            print("Format: ZIP (extracted in download cell)")
+        elif magic[:3] == b'CDF':
+            print("Format: NetCDF")
+        print(f"Openable path: {codec_nc_path}")
+        try:
+            ds = xr.open_dataset(codec_nc_path, engine='netcdf4')
+            print("\nDataset structure:", list(ds.dims), list(ds.data_vars))
+            ds.close()
+        except Exception as e:
+            print(f"Open failed: {e}")
+```
+
+# Storm sections
+
+```{python}
+#| label: storm-section-helper
+#| include: true
+
+water_level_dir = os.path.join(output_dir, 'water_level_plots')
+gtsm_gif_dir = os.path.join(output_dir, 'storm_gtsm_surge_gifs')
+XB_GTSM, YB_GTSM = [-10, 10], [45, 60]
+os.makedirs(water_level_dir, exist_ok=True)
+os.makedirs(gtsm_gif_dir, exist_ok=True)
+img_prefix = 'output'
+
+def get_storm_info(storm_id):
+    group = storm_df[storm_df['Storm'] == storm_id]
+    storm_start = group['Start of Closure'].min()
+    storm_end = group['End of Closure'].fillna(group['Start of Closure'] + pd.Timedelta(days=1)).max()
+    storm_name = f"Storm {storm_id}"
+    closure_ranges = []
+    for _, r in group.iterrows():
+        c_end = r['End of Closure'] if pd.notna(r['End of Closure']) else r['Start of Closure'] + timedelta(days=1)
+        closure_ranges.append((r['Start of Closure'], c_end))
+    return {
+        'storm_id': storm_id,
+        'group': group,
+        'storm_start': storm_start,
+        'storm_end': storm_end,
+        'storm_name': storm_name,
+        'closure_ranges': closure_ranges,
+    }
+
+def run_storm_water_level(storm_i):
+    if storm_i >= len(storm_ids_to_process):
+        return
+    storm_id = storm_ids_to_process[storm_i]
+    info = get_storm_info(storm_id)
+    closure_ranges = info['closure_ranges']
+    storm_start, storm_end = info['storm_start'], info['storm_end']
+    wl_path = os.path.join(water_level_dir, f'water_level_storm_{storm_id}.png')
+    if not os.path.exists(wl_path):
+        tmin = storm_start - pd.Timedelta(hours=24)
+        tmax = storm_end + pd.Timedelta(hours=24)
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10), sharex=True)
+        ax1.plot(TSP, WLP, 'b', linewidth=2, label='Water level')
+        ax1.plot(TSP, TIP, 'r', linewidth=2, label='Astronomical tide')
+        for i, (c_start, c_end) in enumerate(closure_ranges):
+            ax1.axvspan(c_start, c_end, color='m', alpha=0.2, label='Closure period' if i == 0 else None)
+        ax1.set_ylabel('Water level (m)', fontweight='bold', fontsize=20)
+        ax1.set_title("Water Level and Surge", fontweight='bold', fontsize=18)
+        ax1.legend(fontsize=14)
+        ax1.grid(True, alpha=0.3)
+        ax1.tick_params(labelsize=16)
+        ax1.set_xlim(tmin, tmax)
+        surge_color = np.array([255, 103, 40]) / 255
+        ax2.plot(TSP, SUP, color=surge_color, linewidth=2)
+        for c_start, c_end in closure_ranges:
+            ax2.axvspan(c_start, c_end, color='m', alpha=0.2)
+        ax2.set_xlabel('Date', fontweight='bold', fontsize=20)
+        ax2.set_ylabel('Surge (m)', fontweight='bold', fontsize=20)
+        ax2.grid(True, alpha=0.3)
+        ax2.tick_params(labelsize=16)
+        ax2.set_xlim(tmin, tmax)
+        plt.tight_layout()
+        fig.savefig(wl_path, dpi=150, bbox_inches='tight')
+        plt.close(fig)
+    if os.path.exists(wl_path):
+        display(Markdown(f'![]({wl_path})'))
+
+def run_storm_era5_gif(storm_i):
+    if storm_i >= len(storm_ids_to_process):
+        return
+    storm_id = storm_ids_to_process[storm_i]
+    info = get_storm_info(storm_id)
+    closure_ranges = info['closure_ranges']
+    storm_start, storm_end = info['storm_start'], info['storm_end']
+    start_date = storm_start - timedelta(hours=24)
+    end_date = storm_end + timedelta(hours=24)
+    era5_file = os.path.join(era5_dir, f"ERA5_{storm_id}_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.nc")
+    gif_path = os.path.join(gif_output_dir, f'era5_storm_{storm_id}.gif')
+    if not os.path.exists(gif_path) and os.path.exists(era5_file):
+        ds_met = xr.open_dataset(era5_file)
+        LON = ds_met['longitude'].values
+        LAT = ds_met['latitude'].values
+        P_MET = ds_met['msl'].values
+        U_MET = ds_met['u10'].values
+        V_MET = ds_met['v10'].values
+        TS_MET = pd.to_datetime(ds_met['valid_time'].values)
+        X_MET, Y_MET = np.meshgrid(LON, LAT)
+        lon_mask = (LON >= XB_MET[0]) & (LON <= XB_MET[1])
+        lat_mask = (LAT >= YB_MET[0]) & (LAT <= YB_MET[1])
+        lon_idx, lat_idx = np.where(lon_mask)[0], np.where(lat_mask)[0]
+        start_time = storm_start - timedelta(hours=hours_before)
+        end_time = storm_end + timedelta(hours=hours_after)
+        hourly_times = pd.date_range(start=pd.Timestamp(start_time).floor('h'), end=pd.Timestamp(end_time).ceil('h'), freq='h')
+        valid_ts_met = TS_MET[:P_MET.shape[0]]
+        time_mask = (valid_ts_met >= start_time) & (valid_ts_met <= end_time)
+        valid_indices = np.where(time_mask)[0]
+        # One frame per hour, aligned to shared grid for side-by-side sync with GTSM
+        era5_index_per_hour = [valid_indices[np.argmin(np.abs((valid_ts_met[valid_indices] - t).total_seconds()))] for t in hourly_times] if len(valid_indices) > 0 else []
+        if len(era5_index_per_hour) > 0:
+            lat_slice = slice(lat_idx[0], lat_idx[-1]+1)
+            lon_slice = slice(lon_idx[0], lon_idx[-1]+1)
+            X_sub = X_MET[lat_slice, lon_slice]
+            Y_sub = Y_MET[lat_slice, lon_slice]
+            X_vec = X_MET[lat_idx[0]:lat_idx[-1]+1:int_skip, lon_idx[0]:lon_idx[-1]+1:int_skip]
+            Y_vec = Y_MET[lat_idx[0]:lat_idx[-1]+1:int_skip, lon_idx[0]:lon_idx[-1]+1:int_skip]
+            frames = []
+            vmin, vmax = 967, 1020
+            for grid_time, t_idx in zip(hourly_times, era5_index_per_hour):
+                fig = plt.figure(figsize=(12, 10))
+                ax = plt.axes(projection=ccrs.PlateCarree())
+                ax.add_feature(cfeature.OCEAN.with_scale('50m'), facecolor='white')
+                ax.add_feature(cfeature.LAND.with_scale('50m'), facecolor='lightgray', alpha=0.3)
+                ax.add_feature(cfeature.COASTLINE.with_scale('50m'), linewidth=0.8, color='white')
+                ax.add_feature(cfeature.BORDERS.with_scale('50m'), linewidth=0.5, color='white')
+                P_sub = P_MET[t_idx, lat_slice, lon_slice] / 100
+                U_vec = U_MET[t_idx, lat_idx[0]:lat_idx[-1]+1:int_skip, lon_idx[0]:lon_idx[-1]+1:int_skip]
+                V_vec = V_MET[t_idx, lat_idx[0]:lat_idx[-1]+1:int_skip, lon_idx[0]:lon_idx[-1]+1:int_skip]
+                im = ax.pcolormesh(X_sub, Y_sub, P_sub, cmap='jet', shading='gouraud', vmin=vmin, vmax=vmax, transform=ccrs.PlateCarree())
+                ax.quiver(X_vec, Y_vec, U_vec, V_vec, color='k', scale=420, width=0.002, transform=ccrs.PlateCarree())
+                ax.plot(BARRIER_LON, BARRIER_LAT, 'x', color='red', markersize=14, markeredgewidth=3, transform=ccrs.PlateCarree(), zorder=5)
+                ax.set_xlim(XB_MET)
+                ax.set_ylim(YB_MET)
+                ax.gridlines(draw_labels=True, linewidth=0.5, color='gray', alpha=0.5, linestyle='--')
+                ax.tick_params(labelsize=12)
+                ax.set_xlabel('Longitude (deg)', fontweight='bold', fontsize=14)
+                ax.set_ylabel('Latitude (deg)', fontweight='bold', fontsize=14)
+                # Use shared grid time for title and closure so ERA5 and GTSM GIFs stay in sync
+                grid_ts = pd.Timestamp(grid_time)
+                during_closure = any(c_start <= grid_ts <= c_end for c_start, c_end in closure_ranges)
+                title = f"Pressure and wind: {grid_ts.strftime('%Y-%m-%d %H:%M')}" + ("  — BARRIER CLOSED" if during_closure else "")
+                ax.set_title(title, fontweight='bold', fontsize=16, color='darkred' if during_closure else 'black')
+                cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04, shrink=0.6)
+                cbar.set_label('Pressure (hPa)', fontweight='bold', fontsize=12)
+                plt.tight_layout()
+                buf = BytesIO()
+                fig.savefig(buf, format='png', dpi=100, bbox_inches='tight')
+                buf.seek(0)
+                frames.append(imageio.imread(buf))
+                buf.close()
+                plt.close(fig)
+            imageio.mimsave(gif_path, frames, loop=0, fps=GIF_FPS)
+        ds_met.close()
+    if os.path.exists(gif_path):
+        display(Markdown(f'![]({gif_path})'))
+
+def run_storm_gtsm_gif(storm_i):
+    if storm_i >= len(storm_ids_to_process):
+        return
+    storm_id = storm_ids_to_process[storm_i]
+    info = get_storm_info(storm_id)
+    closure_ranges = info['closure_ranges']
+    storm_start, storm_end = info['storm_start'], info['storm_end']
+    gif_path_gtsm = os.path.join(gtsm_gif_dir, f'gtsm_storm_{storm_id}.gif')
+    if not os.path.exists(gif_path_gtsm):
+        first_closure_date = info['group'].iloc[0]['Start of Closure']
+        codec_nc_path = get_codec_nc_path(codec_dir, first_closure_date)
+        if codec_nc_path and os.path.exists(codec_nc_path):
+            ds_gtsm = xr.open_dataset(codec_nc_path, engine='netcdf4')
+            time_var = next((n for n in ['time', 'valid_time'] if n in ds_gtsm.coords or n in ds_gtsm.dims), list(ds_gtsm.coords)[0])
+            TS_GT = pd.to_datetime(ds_gtsm[time_var].values)
+            n_time = len(TS_GT)
+            surge_var = 'storm_surge_residual' if 'storm_surge_residual' in ds_gtsm else next((v for v in ds_gtsm.data_vars if 'surge' in v.lower()), list(ds_gtsm.data_vars)[0])
+            SU_GT = np.asarray(ds_gtsm[surge_var].values)
+            if 'latitude' in ds_gtsm.dims or 'latitude' in ds_gtsm.coords:
+                lat = np.asarray(ds_gtsm['latitude'].values)
+                lon = np.asarray(ds_gtsm['longitude'].values)
+                lon_mask = (lon >= XB_GTSM[0]) & (lon <= XB_GTSM[1])
+                lat_mask = (lat >= YB_GTSM[0]) & (lat <= YB_GTSM[1])
+                lon, lat = lon[lon_mask], lat[lat_mask]
+                X_GT, Y_GT = np.meshgrid(lon, lat)
+                if SU_GT.shape[0] != n_time:
+                    SU_GT = np.transpose(SU_GT, (2, 1, 0)) if SU_GT.shape[2] == n_time else SU_GT
+                li, lj = np.where(lat_mask)[0], np.where(lon_mask)[0]
+                SU_GT = SU_GT[:, li, :][:, :, lj]
+                gridded = True
+            else:
+                xcoord = 'station_x_coordinate' if 'station_x_coordinate' in ds_gtsm else 'lon'
+                ycoord = 'station_y_coordinate' if 'station_y_coordinate' in ds_gtsm else 'lat'
+                X_GT = np.asarray(ds_gtsm[xcoord].values)
+                Y_GT = np.asarray(ds_gtsm[ycoord].values)
+                mask = (X_GT >= XB_GTSM[0]) & (X_GT <= XB_GTSM[1]) & (Y_GT >= YB_GTSM[0]) & (Y_GT <= YB_GTSM[1])
+                X_GT, Y_GT = X_GT[mask], Y_GT[mask]
+                if SU_GT.ndim == 2:
+                    SU_GT = SU_GT[:, mask]
+                gridded = False
+            start_time = storm_start - timedelta(hours=hours_before)
+            end_time = storm_end + timedelta(hours=hours_after)
+            hourly_times = pd.date_range(start=pd.Timestamp(start_time).floor('h'), end=pd.Timestamp(end_time).ceil('h'), freq='h')
+            time_mask = (TS_GT >= start_time) & (TS_GT <= end_time)
+            valid_indices = np.where(time_mask)[0]
+            # One frame per hour, same grid as ERA5 for side-by-side sync
+            gtsm_index_per_hour = [valid_indices[np.argmin(np.abs((pd.to_datetime(TS_GT[valid_indices]) - t).total_seconds()))] for t in hourly_times] if len(valid_indices) > 0 else []
+            if len(gtsm_index_per_hour) > 0:
+                frames = []
+                vmin, vmax = -0.5, 1.0
+                for grid_time, t_idx in zip(hourly_times, gtsm_index_per_hour):
+                    fig = plt.figure(figsize=(12, 10))
+                    ax = plt.axes(projection=ccrs.PlateCarree())
+                    ax.add_feature(cfeature.OCEAN.with_scale('50m'), facecolor='white')
+                    ax.add_feature(cfeature.LAND.with_scale('50m'), facecolor='lightgray', alpha=0.3)
+                    ax.add_feature(cfeature.COASTLINE.with_scale('50m'), linewidth=0.8, color='white')
+                    ax.add_feature(cfeature.BORDERS.with_scale('50m'), linewidth=0.5, color='white')
+                    surge_t = SU_GT[t_idx]
+                    if gridded and surge_t.shape != Y_GT.shape:
+                        surge_t = surge_t.T
+                    im = ax.pcolormesh(X_GT, Y_GT, surge_t, cmap='jet', shading='gouraud', vmin=vmin, vmax=vmax, transform=ccrs.PlateCarree()) if gridded else ax.scatter(X_GT, Y_GT, c=surge_t, cmap='jet', s=15, vmin=vmin, vmax=vmax, transform=ccrs.PlateCarree())
+                    ax.plot(BARRIER_LON, BARRIER_LAT, 'x', color='red', markersize=14, markeredgewidth=3, transform=ccrs.PlateCarree(), zorder=5)
+                    ax.set_xlim(XB_GTSM)
+                    ax.set_ylim(YB_GTSM)
+                    ax.gridlines(draw_labels=True, linewidth=0.5, color='gray', alpha=0.5, linestyle='--')
+                    ax.tick_params(labelsize=12)
+                    ax.set_xlabel('Longitude (deg)', fontweight='bold', fontsize=14)
+                    ax.set_ylabel('Latitude (deg)', fontweight='bold', fontsize=14)
+                    # Use same shared grid time for title and closure so ERA5 and GTSM GIFs stay in sync
+                    grid_ts = pd.Timestamp(grid_time)
+                    during_closure = any(c_start <= grid_ts <= c_end for c_start, c_end in closure_ranges)
+                    title = f"GTSM surge: {grid_ts.strftime('%Y-%m-%d %H:%M')}" + ("  — BARRIER CLOSED" if during_closure else "")
+                    ax.set_title(title, fontweight='bold', fontsize=16, color='darkred' if during_closure else 'black')
+                    cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04, shrink=0.6)
+                    cbar.set_label('Surge (m)', fontweight='bold', fontsize=12)
+                    plt.tight_layout()
+                    buf = BytesIO()
+                    fig.savefig(buf, format='png', dpi=100, bbox_inches='tight')
+                    buf.seek(0)
+                    frames.append(imageio.imread(buf))
+                    buf.close()
+                    plt.close(fig)
+                imageio.mimsave(gif_path_gtsm, frames, loop=0, fps=GIF_FPS)
+            ds_gtsm.close()
+    if os.path.exists(gif_path_gtsm):
+        display(Markdown(f'![]({gif_path_gtsm})'))
+```
+
+## Storm 1
+
+```{python}
+#| label: storm-1
+
+run_storm_water_level(0)
+run_storm_era5_gif(0)
+run_storm_gtsm_gif(0)
+```
+
+## Storm 2
+
+```{python}
+#| label: storm-2
+
+run_storm_water_level(1)
+run_storm_era5_gif(1)
+run_storm_gtsm_gif(1)
+```
+
+## Storm 3
+
+```{python}
+#| label: storm-3
+
+run_storm_water_level(2)
+run_storm_era5_gif(2)
+run_storm_gtsm_gif(2)
+```
+
+## Storm 4
+
+```{python}
+#| label: storm-4
+
+run_storm_water_level(3)
+run_storm_era5_gif(3)
+run_storm_gtsm_gif(3)
+```
+
+## Storm 5
+
+```{python}
+#| label: storm-5
+
+run_storm_water_level(4)
+run_storm_era5_gif(4)
+run_storm_gtsm_gif(4)
+```
+
+## Storm 6
+
+```{python}
+#| label: storm-6
+
+run_storm_water_level(5)
+run_storm_era5_gif(5)
+run_storm_gtsm_gif(5)
+```
+
+## Storm 7
+
+```{python}
+#| label: storm-7
+
+run_storm_water_level(6)
+run_storm_era5_gif(6)
+run_storm_gtsm_gif(6)
+```
+
+## Storm 8
+
+```{python}
+#| label: storm-8
+
+run_storm_water_level(7)
+run_storm_era5_gif(7)
+run_storm_gtsm_gif(7)
+```
+
+## Storm 9
+
+```{python}
+#| label: storm-9
+
+run_storm_water_level(8)
+run_storm_era5_gif(8)
+run_storm_gtsm_gif(8)
+```
+
+## Storm 10
+
+```{python}
+#| label: storm-10
+
+run_storm_water_level(9)
+run_storm_era5_gif(9)
+run_storm_gtsm_gif(9)
+```
+
+## Storm 11
+
+```{python}
+#| label: storm-11
+
+run_storm_water_level(10)
+run_storm_era5_gif(10)
+run_storm_gtsm_gif(10)
+```
+
+## Storm 12
+
+```{python}
+#| label: storm-12
+
+run_storm_water_level(11)
+run_storm_era5_gif(11)
+run_storm_gtsm_gif(11)
+```
+
+## Storm 13
+
+```{python}
+#| label: storm-13
+
+run_storm_water_level(12)
+run_storm_era5_gif(12)
+run_storm_gtsm_gif(12)
+```
+
+## Storm 14
+
+```{python}
+#| label: storm-14
+
+run_storm_water_level(13)
+run_storm_era5_gif(13)
+run_storm_gtsm_gif(13)
+```
+
+## Storm 15
+
+```{python}
+#| label: storm-15
+
+run_storm_water_level(14)
+run_storm_era5_gif(14)
+run_storm_gtsm_gif(14)
+```
+
+## Storm 16
+
+```{python}
+#| label: storm-16
+
+run_storm_water_level(15)
+run_storm_era5_gif(15)
+run_storm_gtsm_gif(15)
+```
+
+## Storm 17
+
+```{python}
+#| label: storm-17
+
+run_storm_water_level(16)
+run_storm_era5_gif(16)
+run_storm_gtsm_gif(16)
+```
+
+## Storm 18
+
+```{python}
+#| label: storm-18
+
+run_storm_water_level(17)
+run_storm_era5_gif(17)
+run_storm_gtsm_gif(17)
+```
+
+## Storm 19
+
+```{python}
+#| label: storm-19
+
+run_storm_water_level(18)
+run_storm_era5_gif(18)
+run_storm_gtsm_gif(18)
+```
+
+## Storm 20
+
+```{python}
+#| label: storm-20
+
+run_storm_water_level(19)
+run_storm_era5_gif(19)
+run_storm_gtsm_gif(19)
+```
+
+## Storm 21
+
+```{python}
+#| label: storm-21
+
+run_storm_water_level(20)
+run_storm_era5_gif(20)
+run_storm_gtsm_gif(20)
+```
+
+## Storm 22
+
+```{python}
+#| label: storm-22
+
+run_storm_water_level(21)
+run_storm_era5_gif(21)
+run_storm_gtsm_gif(21)
+```
+
+## Storm 23
+
+```{python}
+#| label: storm-23
+
+run_storm_water_level(22)
+run_storm_era5_gif(22)
+run_storm_gtsm_gif(22)
+```
+
+## Storm 24
+
+```{python}
+#| label: storm-24
+
+run_storm_water_level(23)
+run_storm_era5_gif(23)
+run_storm_gtsm_gif(23)
+```
+
+## Storm 25
+
+```{python}
+#| label: storm-25
+
+run_storm_water_level(24)
+run_storm_era5_gif(24)
+run_storm_gtsm_gif(24)
+```

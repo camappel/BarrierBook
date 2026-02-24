@@ -1,0 +1,17 @@
+---
+title: "Barrier Book"
+---
+
+Barrier Book is an interactive documentation and analysis site exploring the functioning, operation, meteorological context, and flood defense performance of major storm surge barriers.
+
+This site presents:
+- **Barrier closure histories:** Analyzing when and why flood barriers were closed over the past decades.
+- **Tidal and water level data:** Processing long-term tide gauge observations and predicted astronomical tides.
+- **Meteorological conditions during storms:** Examining wind, pressure, and storm data associated with each closure.
+- **Spatio-temporal characteristics:** Exploring the spatial and temporal patterns of storm events and barrier operations.
+- **Visualizations:** Comprehensive figures showing barrier operations, extreme sea levels, meteorological extremes, and trends.
+- **Workflows and notebooks:** Step-by-step technical analyses and reproducible code using Python and Quarto.
+
+Barrier Book is designed for researchers, civil engineers, and decision-makers interested in flood risk, coastal defense, and climate adaptation.
+
+All analysis code and workflows are open and reproducible, with data sourced from official Dutch and UK agencies.

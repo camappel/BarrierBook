@@ -1,0 +1,676 @@
+---
+title: "Eastern Scheldt Barrier"
+execute:
+  echo: false
+  warnings: false
+---
+
+```{python}
+#| label: shared-utilities
+#| include: true
+
+import pandas as pd
+import numpy as np
+import pickle
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+from datetime import datetime, timedelta
+import os
+import xarray as xr
+import warnings
+warnings.filterwarnings('ignore')
+```
+
+```{python}
+#| label: shared-configuration
+#| include: true
+
+# Shared configuration
+output_dir = 'output'
+data_dir = '../2_DATA'
+os.makedirs(output_dir, exist_ok=True)
+
+# Spatial bounds for maps
+XB_GTSM = [-10, 10]  # GTSM longitude bounds
+YB_GTSM = [45, 60]   # GTSM latitude bounds
+XB_MET = [-30, 15]   # ERA5 longitude bounds
+YB_MET = [40, 70]    # ERA5 latitude bounds
+
+# Time intervals for spatial plots
+TINT = 6   # Time interval for GTSM plots (hours)
+TINT_MET = 12  # Time interval for meteorological plots (hours)
+```
+
+# Barrier Closures
+
+```{python}
+#| label: setup-master1
+#| include: true
+# Configuration - years from 1986 to 2024
+
+Y = list(range(1986, 2025))  # [1986, 1987, ..., 2024]
+
+print(f"Analysis configuration:")
+print(f"  Water years: {Y[0]}/{str(Y[0]+1)[2:]} to {Y[-1]}/{str(Y[-1]+1)[2:]} ({len(Y)} years)")
+```
+
+```{python}
+#| label: load-closures
+#| include: true
+
+# 1. Observed closure data - Eastern Scheldt
+excel_file = '../2_DATA/1_BARRIER_CLOSURES/Eastern_Scheldt_Barrier_Past_Closures_2024.xlsx'
+df = pd.read_excel(excel_file, sheet_name='Closures')
+
+# Set up closure start time: prefer 'Start of closure', fallback to 'Date' + 12:00
+start = pd.to_datetime(
+    df['Start of closure'].where(
+        df['Start of closure'].notna(),
+        df['Date'].astype(str) + " 12:00"
+    )
+).dt.tz_localize(None)
+
+# Set up closure end time: prefer 'End of closure', fallback to start + 12 hours
+end = pd.to_datetime(
+    df['End of closure'].where(
+        df['End of closure'].notna(),
+        start + pd.Timedelta(hours=12)
+    )
+).dt.tz_localize(None)
+
+# --- Assign water year to each closure ---
+# Water year runs from July 1 (year N) to June 30 (year N+1)
+def get_water_year(dt):
+    if dt.month >= 7:
+        return f"{dt.year}/{str(dt.year+1)[2:]}"
+    else:
+        return f"{dt.year-1}/{str(dt.year)[2:]}"
+
+water_years = start.map(get_water_year)
+storm_labels = [1]
+current_storm = 1
+for prev, curr in zip(start[:-1], start[1:]):
+    if (curr - prev).total_seconds() > 24 * 3600:
+        current_storm += 1
+    storm_labels.append(current_storm)
+
+# Build event DataFrame with water year column
+storm_df = pd.DataFrame({
+    # Assign "Storm" labels so that closures within 25 hours of each other get the same storm number
+    'Storm': storm_labels,
+    'Start of Closure': start,
+    'End of Closure': end,
+    'Water Year': water_years
+})
+```
+
+```{python}
+#| label: plot-closures
+#| fig-cap: "Number of Eastern Scheldt barrier closures per water year (July 1 to June 30), 1986-2024"
+#| fig-width: 12
+#| fig-height: 6
+
+# Group by water year for counting closures per year
+closure_summary = storm_df.groupby('Water Year').size().reindex(
+    [f"{y}/{str(y+1)[2:]}" for y in Y], fill_value=0
+)
+
+print(f"\nClosures per water year calculated for {len(closure_summary)} years")
+print(f"  Total closures: {closure_summary.sum()}")
+print(f"  Min per year: {closure_summary.min():.1f}")
+print(f"  Mean per year: {closure_summary.mean():.2f}")
+print(f"  Max per year: {closure_summary.max():.1f}")
+
+fig, ax = plt.subplots(figsize=(12, 6))
+
+# Use closure_summary from previous cell (already reindexed and includes zeros)
+ax.bar(range(1, len(closure_summary) + 1), closure_summary.values, color='black')
+ax.set_xlim(0.2, len(closure_summary) + 0.8)
+ax.set_xticks(range(1, len(closure_summary) + 1))
+ax.set_xticklabels(closure_summary.index, rotation=90)
+ax.set_ylim(0, 5)
+ax.set_yticks(range(6))
+ax.set_ylabel('Number of closures', fontweight='bold', fontsize=18)
+ax.set_title('Eastern Scheldt', fontweight='bold', fontsize=18)
+ax.grid(True, alpha=0.3)
+ax.tick_params(labelsize=16)
+
+plt.tight_layout()
+plt.show()
+
+print(storm_df)
+```
+
+# Observed Water Level Time Series
+
+Load the main tide gauge dataset from the RPBU gauge covering April 1987 to December 2022.
+
+```{python}
+#| label: load-rpbu-1987-2022
+#| include: true
+
+# 1. Load in Data 1987 to 2022 (RPBU gauge)
+file_in = os.path.join(data_dir, '2_TIDE_GAUGE/ES/RPBU_1987_2022.dat')
+D = np.loadtxt(file_in)
+
+# Create time series: April 15, 1987 to December 31, 2022, 10-minute intervals
+start_date = datetime(1987, 4, 15, 0, 0, 0)
+end_date = datetime(2022, 12, 31, 23, 50, 0)
+TS1 = pd.date_range(start=start_date, end=end_date, freq='10min').to_pydatetime()
+
+# Extract water level data from column 3 (index 2)
+WL1 = D[:, 2]
+
+# Remove default values (9999 indicates missing)
+WL1[WL1 == 9999] = np.nan
+
+# Convert to meters (from cm)
+WL1 = WL1 / 100.0
+
+print(f"Loaded RPBU 1987-2022: {len(TS1):,} data points")
+print(f"  Start: {TS1[0]}")
+print(f"  End: {TS1[-1]}")
+print(f"  Valid data: {np.sum(~np.isnan(WL1)):,} points ({100*np.sum(~np.isnan(WL1))/len(WL1):.1f}%)")
+```
+
+Load the 2023 data from the RPBU gauge to extend the time series.
+
+```{python}
+#| label: load-rpbu-2023
+#| include: true
+
+# 2. Load in Data 2023 (RPBU gauge)
+file_in = os.path.join(data_dir, '2_TIDE_GAUGE/ES/RPBU_2023.dat')
+D = np.loadtxt(file_in)
+
+# Create time series: January 1, 2023 to December 31, 2023, 10-minute intervals
+start_date = datetime(2023, 1, 1, 0, 0, 0)
+end_date = datetime(2023, 12, 31, 23, 50, 0)
+TS2 = pd.date_range(start=start_date, end=end_date, freq='10min').to_pydatetime()
+
+# Extract water level data from column 3 (index 2)
+WL2 = D[:, 2]
+
+# Remove default values (9999 indicates missing)
+WL2[WL2 == 9999] = np.nan
+
+# Convert to meters (from cm)
+WL2 = WL2 / 100.0
+
+print(f"Loaded RPBU 2023: {len(TS2):,} data points")
+print(f"  Start: {TS2[0]}")
+print(f"  End: {TS2[-1]}")
+print(f"  Valid data: {np.sum(~np.isnan(WL2)):,} points ({100*np.sum(~np.isnan(WL2))/len(WL2):.1f}%)")
+```
+
+Load data from the OS4 gauge, which provides coverage for the early period before RPBU data begins.
+
+```{python}
+#| label: load-os4
+#| include: true
+
+# 3. Load in Data 1982 to 2023 for OS4 gauge
+file_in = os.path.join(data_dir, '2_TIDE_GAUGE/ES/OS4_1982_2023.dat')
+D = np.loadtxt(file_in)
+
+# Create time series: January 1, 1982 to December 31, 2023, 10-minute intervals
+start_date = datetime(1982, 1, 1, 0, 0, 0)
+end_date = datetime(2023, 12, 31, 23, 50, 0)
+TSO = pd.date_range(start=start_date, end=end_date, freq='10min').to_pydatetime()
+
+# Extract water level data from column 3 (index 2)
+WLO = D[:, 2]
+
+# Remove default values (values outside [-500, 500] are invalid)
+WLO[(WLO < -500) | (WLO > 500)] = np.nan
+
+# Convert to meters (from cm)
+WLO = WLO / 100.0
+
+print(f"Loaded OS4 1982-2023: {len(TSO):,} data points")
+print(f"  Start: {TSO[0]}")
+print(f"  End: {TSO[-1]}")
+print(f"  Valid data: {np.sum(~np.isnan(WLO)):,} points ({100*np.sum(~np.isnan(WLO))/len(WLO):.1f}%)")
+```
+
+Combine the time series from different gauges to create a continuous record. Use OS4 data for the early period (1986-1987) before RPBU starts, then switch to RPBU data for the main period.
+
+```{python}
+#| label: combine-series
+#| include: true
+
+# 4. Combine time series
+# Use OS4 data for period 1986-01-01 to 1987-04-15 (before RPBU starts)
+start_combine = datetime(1986, 1, 1, 0, 0, 0)
+end_combine = datetime(1987, 4, 15, 0, 0, 0)
+mask_early = (TSO >= start_combine) & (TSO < end_combine)
+TSO_early = TSO[mask_early]
+WLO_early = WLO[mask_early]
+
+# Combine: OS4 early period + RPBU 1987-2022 + RPBU 2023
+TSP = np.concatenate([TSO_early, TS1, TS2])
+WLP = np.concatenate([WLO_early, WL1, WL2])
+# SUP (surge = WLP - predicted tide) is computed after tidal analysis
+
+# Create reference time series for checking
+TSCHECK = pd.date_range(
+    start=datetime(1986, 1, 1, 0, 0, 0),
+    end=datetime(2023, 12, 31, 23, 50, 0),
+    freq='10min'
+).to_pydatetime()
+
+print(f"\nCombined time series: {len(TSP):,} data points")
+print(f"  Start: {TSP[0]}")
+print(f"  End: {TSP[-1]}")
+print(f"  Valid data: {np.sum(~np.isnan(WLP)):,} points ({100*np.sum(~np.isnan(WLP))/len(WLP):.1f}%)")
+print(f"  Time span: {(TSP[-1] - TSP[0]).days} days")
+```
+
+```{python}
+#| label: plot-time-series
+#| fig-cap: "Combined tide gauge water level time series for the Eastern Scheldt, 1986-2023. Data combines OS4 gauge (1986-1987) and RPBU gauge (1987-2023) measurements at 10-minute intervals."
+#| fig-width: 14
+#| fig-height: 6
+
+fig, ax = plt.subplots(figsize=(14, 6))
+ax.plot(TSP, WLP, 'b', linewidth=0.5)
+ax.set_xlabel('Date', fontweight='bold', fontsize=20)
+ax.set_ylabel('Water level (m NAP)', fontweight='bold', fontsize=20)
+ax.grid(True, alpha=0.3)
+ax.tick_params(labelsize=16)
+
+plt.tight_layout()
+plt.show()
+```
+
+# Tidal Harmonic Analysis
+```{python}
+#| label: setup-master2
+#| include: true
+
+from pytides.tide import Tide
+
+# Configuration
+Y = list(range(1986, 2024))  # Years 1986 to 2023
+th = 60  # Data quality threshold (percentage)
+lat = 51.64  # Latitude for tidal analysis
+
+print(f"Analysis configuration:")
+print(f"  Years: {Y[0]} to {Y[-1]} ({len(Y)} years)")
+print(f"  Data quality threshold: {th}%")
+print(f"  Latitude: {lat}°")
+```
+
+```{python}
+#| label: load-data-master
+#| include: true
+
+TSP = np.array(TSP)
+WLP = np.array(WLP)
+
+print(f"Loaded {len(TSP):,} data points")
+print(f"  Start: {TSP[0]}")
+print(f"  End: {TSP[-1]}")
+print(f"  Valid data: {np.sum(~np.isnan(WLP)):,} points ({100*np.sum(~np.isnan(WLP))/len(WLP):.1f}%)")
+```
+
+```{python}
+#| label: data-quality
+#| include: true
+
+print("\nCalculating data quality per year...")
+DQ = []
+
+for y in Y:
+    # Find data points in this calendar year (Jan 1 to Jan 1 next year)
+    start_date = datetime(y, 1, 1, 0, 0, 0)
+    end_date = datetime(y + 1, 1, 1, 0, 0, 0)
+    mask = (TSP >= start_date) & (TSP < end_date)
+    j = np.where(mask)[0]
+    
+    if len(j) == 0:
+        quality = 0
+    else:
+        # Count non-NaN values
+        k = np.where(~np.isnan(WLP[j]))[0]
+        quality = (len(k) / len(j)) * 100
+    
+    # Initialize with 3 columns: [year, quality, reference_year]
+    # reference_year will be filled in during tidal analysis
+    DQ.append([y, quality, np.nan])
+
+DQ = np.array(DQ)
+
+# Display summary statistics
+print(f"\nData quality summary:")
+print(f"  Range: {np.min(DQ[:, 1]):.1f}% to {np.max(DQ[:, 1]):.1f}%")
+print(f"  Mean: {np.mean(DQ[:, 1]):.1f}%")
+print(f"  Years with quality >= {th}%: {np.sum(DQ[:, 1] >= th)}/{len(Y)}")
+```
+
+```{python}
+#| label: tidal-analysis
+#| include: true
+
+# Check if results already exist
+mast3_file = os.path.join(output_dir, 'mast3.pkl')
+if os.path.exists(mast3_file):
+    print("\nLoading existing tidal analysis results...")
+    with open(mast3_file, 'rb') as f:
+        existing_data = pickle.load(f)
+    if 'TIP' in existing_data and 'TSP2' in existing_data and 'DQ' in existing_data:
+        TIP = existing_data['TIP']
+        TSP2 = existing_data['TSP2']
+        DQ = existing_data['DQ']
+        print(f"Loaded existing results:")
+        print(f"  Total predictions: {len(TIP):,} points")
+        if len(TIP) > 0:
+            print(f"  Start: {TSP2[0]}")
+            print(f"  End: {TSP2[-1]}")
+    else:
+        print("Existing file found but missing required data. Re-running analysis...")
+        TSP2 = []
+        TIP = []
+        run_analysis = True
+else:
+    print("\nNo existing results found. Performing tidal analysis and prediction...")
+    TSP2 = []
+    TIP = []
+    run_analysis = True
+
+if 'run_analysis' in locals() and run_analysis:
+    for co, y in enumerate(Y):
+        print(f"  Processing year {y} ({co+1}/{len(Y)})...")
+        
+        # Determine reference year
+        if DQ[co, 1] >= th:
+            # Use target year as reference
+            yr = y
+            DQ[co, 2] = yr
+        else:
+            # Find nearest year with quality >= threshold
+            # Calculate distances from target year
+            distances = np.abs(DQ[:, 0] - y)
+            
+            # Filter to only years with quality >= threshold
+            good_mask = DQ[:, 1] >= th
+            
+            if np.any(good_mask):
+                # Get distances for good years only
+                good_distances = distances[good_mask]
+                good_indices = np.where(good_mask)[0]
+                
+                # Find nearest good year
+                nearest_idx = good_indices[np.argmin(good_distances)]
+                yr = int(DQ[nearest_idx, 0])
+            else:
+                # Fallback: use year with best quality
+                best_idx = np.argmax(DQ[:, 1])
+                yr = int(DQ[best_idx, 0])
+            
+            DQ[co, 2] = yr
+        
+        # Extract reference year data (1 year + 1 day for analysis)
+        ref_start = datetime(yr, 1, 1, 0, 0, 0)
+        ref_end = datetime(yr + 1, 1, 2, 0, 0, 0)  # +1 day
+        
+        mask_ref = (TSP >= ref_start) & (TSP < ref_end)
+        j_ref = np.where(mask_ref)[0]
+        
+        if len(j_ref) == 0:
+            print(f"    Warning: No data found for reference year {yr}")
+            continue
+        
+        # Get water levels and times for reference year
+        WLP_ref = WLP[j_ref]
+        TSP_ref = TSP[j_ref]
+        
+        # Remove NaN values for pytides analysis
+        valid_mask = ~np.isnan(WLP_ref)
+        WLP_clean = WLP_ref[valid_mask]
+        TSP_clean = TSP_ref[valid_mask]
+        
+        if len(WLP_clean) < 1000:  # Need sufficient data for analysis
+            print(f"    Warning: Insufficient data for reference year {yr} ({len(WLP_clean)} points)")
+            continue
+        
+        # Perform tidal analysis using pytides
+        try:
+            tide_model = Tide.decompose(
+                heights=WLP_clean,
+                t=TSP_clean
+            )
+            print(f"    Analyzed {len(WLP_clean):,} points from reference year {yr}")
+        except Exception as e:
+            print(f"    Error in tidal analysis for year {y}: {e}")
+            continue
+        
+        # Generate prediction timestamps for target year (10-minute intervals)
+        pred_start = datetime(y, 1, 1, 0, 0, 0)
+        pred_end = datetime(y, 12, 31, 23, 50, 0)
+        tsp2 = pd.date_range(start=pred_start, end=pred_end, freq='10min').to_pydatetime()
+        
+        # Predict tides
+        try:
+            tip = tide_model.at(tsp2)
+            TIP.extend(tip)
+            TSP2.extend(tsp2)
+            print(f"    Predicted {len(tip):,} points for year {y}")
+        except Exception as e:
+            print(f"    Error in prediction for year {y}: {e}")
+            continue
+    
+    # Convert to numpy arrays
+    TSP2 = np.array(TSP2)
+    TIP = np.array(TIP)
+    
+    print(f"\nTotal predictions: {len(TIP):,} points")
+    if len(TIP) > 0:
+        print(f"  Start: {TSP2[0]}")
+        print(f"  End: {TSP2[-1]}")
+
+SUP = WLP - TIP
+```
+
+This figure compares observed water levels (blue) with predicted astronomical tides (red) from harmonic analysis. The predicted tides represent the astronomical component only, while observed water levels include both tides and meteorological effects.
+
+```{python}
+#| label: plot-comparison
+#| fig-cap: "Comparison of observed water levels (blue) and predicted astronomical tides (red) for the Eastern Scheldt, 1986-2023"
+#| fig-width: 14
+#| fig-height: 6
+
+fig, ax = plt.subplots(figsize=(14, 6))
+ax.plot(TSP2, TIP, 'r', linewidth=0.5, label='Predicted tide', alpha=0.7)
+ax.plot(TSP, WLP, 'b', linewidth=0.5, label='Observed water level', alpha=0.7)
+ax.set_xlabel('Date', fontweight='bold', fontsize=16)
+ax.set_ylabel('Level (m NAP)', fontweight='bold', fontsize=16)
+ax.legend(fontsize=14)
+ax.grid(True, alpha=0.3)
+ax.tick_params(labelsize=14)
+
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+# For each closure: get max WL, time, predicted tide, and surge (no mask, just indices)
+from scipy.interpolate import interp1d
+
+tip_interp = interp1d(
+    [pd.Timestamp(t).timestamp() for t in TSP2],
+    TIP, kind='linear', bounds_error=False, fill_value='extrapolate'
+)
+
+max_WL, max_time, pred_tide, surge = [], [], [], []
+
+for _, row in storm_df.iterrows():
+    # Indices of TSP within closure period
+    idxs = [i for i, t in enumerate(TSP) if row['Start of Closure'] <= t <= row['End of Closure']]
+    if not idxs:
+        max_WL.append(np.nan)
+        max_time.append(np.nan)
+        pred_tide.append(np.nan)
+        surge.append(np.nan)
+    else:
+        i = idxs[np.argmax(WLP[idxs])]
+        mwl = WLP[i]
+        tmax = TSP[i]
+        tide = float(tip_interp(pd.Timestamp(tmax).timestamp()))
+        max_WL.append(mwl)
+        max_time.append(tmax)
+        pred_tide.append(tide)
+        surge.append(mwl - tide)
+
+storm_df['Max WL'] = max_WL
+storm_df['Max WL Time'] = max_time
+storm_df['Pred Tide @ Max'] = pred_tide
+storm_df['Surge @ Max'] = surge
+
+print(storm_df[['Storm', 'Start of Closure', 'End of Closure', 'Max WL', 'Max WL Time', 'Pred Tide @ Max', 'Surge @ Max']])
+```
+
+```{python}
+#| label: save-mast1
+#| include: true
+
+# Save everything from closures.qmd for reuse (one data object per qmd)
+mast1_data = {
+    'Y': Y,
+    'df': df,
+    'storm_df': storm_df,
+    'closure_summary': closure_summary,
+    'TS1': TS1, 'WL1': WL1,
+    'TS2': TS2, 'WL2': WL2,
+    'TSO': TSO, 'WLO': WLO,
+    'TSP': TSP, 'WLP': WLP,
+    'SUP': SUP,
+    'TIP': TIP, 'TSP2': TSP2, 'DQ': DQ,
+    'TSCHECK': TSCHECK,
+    'th': th, 'lat': lat,
+}
+mast1_path = os.path.join(output_dir, 'mast1.pkl')
+with open(mast1_path, 'wb') as f:
+    pickle.dump(mast1_data, f)
+print(f"Saved data to {mast1_path}")
+```
+
+```{python}
+#| label: plot-predicted-tide-at-max
+#| include: true
+
+# Labels for each closure (just use index or storm number for clarity)
+labels = (storm_df.index + 1).astype(str).tolist()
+
+fig, ax = plt.subplots(figsize=(14, 6))
+# Plot predicted tide (bottom) and surge (top)
+ax.bar(labels, storm_df['Pred Tide @ Max'], label='Predicted tide at max', color='red')
+ax.bar(labels, storm_df['Surge @ Max'], bottom=storm_df['Pred Tide @ Max'], label='Surge at max', color='green')
+
+# Add a horizontal dotted line at 3m
+ax.axhline(3, color='black', linestyle=':', linewidth=2)
+
+ax.set_xlabel('Closure')
+ax.set_ylabel('Max water level (m NAP)')
+ax.set_title('Max Water Level per Closure: Tide vs Surge')
+ax.legend()
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+#| label: plot-faceted-closures
+#| include: true
+# Faceted plot: one panel per closure showing water level, predicted tide, and closure period
+
+import math
+
+# Group closures by storm; for each storm, grab min start date and max end date (the 'window' for all closures in the storm)
+storms = storm_df['Storm'].unique()
+n_storms = len(storms)
+ncols = 5
+nrows = math.ceil(n_storms / ncols)
+
+fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(7 * ncols, 4 * nrows), sharex=False)
+if nrows == 1 and ncols == 1:
+    axes = np.array([[axes]])
+elif nrows == 1 or ncols == 1:
+    axes = axes.reshape((nrows, ncols))
+
+for idx, storm in enumerate(storms):
+    ax = axes.flatten()[idx]
+    group = storm_df[storm_df['Storm'] == storm]
+    storm_start = group['Start of Closure'].min()
+    storm_end = group['End of Closure'].max()
+    # Display context ±24h
+    tmin = storm_start - pd.Timedelta(hours=24)
+    tmax = storm_end + pd.Timedelta(hours=24)
+    mask = (TSP >= tmin) & (TSP <= tmax)
+    ax.plot(TSP[mask], WLP[mask], 'b', linewidth=1.5, label='Observed')
+    ax.plot(TSP[mask], TIP[mask], 'r', linewidth=1.2, label='Predicted tide')
+    # Highlight each closure period individually
+    for cl_idx, row in group.iterrows():
+        cl_start = row['Start of Closure']
+        cl_end = row['End of Closure']
+        label = 'Closure period' if cl_idx == group.index[0] else None  # label only once for legend
+        ax.axvspan(cl_start, cl_end, color='m', alpha=0.25, label=label)
+    # For each closure in this storm, plot the max water level marker (if available)
+    for _, row in group.iterrows():
+        if not pd.isnull(row['Max WL Time']):
+            ax.plot(row['Max WL Time'], row['Max WL'], 'ko', label='Max WL')
+    # Set y-axis limit to 3.5m for every subplot
+    ax.set_ylim(top=3.8)
+    # Add horizontal dashed line at 3m
+    ax.axhline(3, color='black', linestyle=':', linewidth=2)
+    ax.set_title(f"Storm {storm}: {storm_start:%Y-%m-%d}", fontsize=13, fontweight='bold')
+    ax.set_ylabel('Water level (m)')
+    ax.grid(alpha=0.3)
+    ax.set_xlim(tmin, tmax)
+    ax.xaxis.set_tick_params(rotation=30)
+    # Only show legend on first subplot
+    if idx == 0:
+        ax.legend(fontsize=10, loc='upper left')
+
+# Remove empty subplots if nrows*ncols > n_storms
+for j in range(n_storms, nrows * ncols):
+    fig.delaxes(axes.flatten()[j])
+
+plt.tight_layout()
+plt.show()
+```
+
+
+```{python}
+#| label: plot-predicted-high-waters
+#| fig-cap: "Predicted high waters, observed water levels, and barrier closures for the Eastern Scheldt"
+#| fig-width: 14
+#| fig-height: 8
+
+fig, ax = plt.subplots(figsize=(14, 8))
+
+# Plot vertical lines for barrier closure dates using storm_df
+for closure_date in storm_df['Start of Closure']:
+    ax.axvline(closure_date, color='m', linestyle='--', linewidth=2, alpha=0.7)
+
+# Plot predicted tides (TIP)
+ax.plot(TSP, TIP, 'r', linewidth=1, label='Predicted tide (TIP)', alpha=0.8)
+
+# Plot observed water levels (WLP)
+ax.plot(TSP, WLP, 'b', linewidth=1, label='Observed water level (WLP)', alpha=0.8)
+
+# Plot difference (WLP - TIP) - surge component
+ax.plot(TSP, WLP - TIP, 'g', linewidth=1, label='Surge (WLP - TIP)', alpha=0.8)
+
+# Formatting
+ax.grid(True, alpha=0.3)
+ax.set_xlabel('Date', fontweight='bold', fontsize=16)
+ax.set_ylabel('Level (m)', fontweight='bold', fontsize=16)
+ax.set_ylim(-3, 4)
+ax.legend(fontsize=14, loc='best')
+ax.tick_params(labelsize=14)
+
+plt.tight_layout()
+plt.show()
+```

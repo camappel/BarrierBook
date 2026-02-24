@@ -1,0 +1,22 @@
+project:
+  type: website
+  output-dir: docs
+  render:
+    - index.qmd
+    - cloures.qmd
+    - storm.qmd
+
+website:
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: cloures.qmd
+        text: Closures
+      - href: storm.qmd
+        text: Storm Analysis
+
+resources:
+  - output
+  - .nojekyll   # copied to docs/ so GitHub Pages skips Jekyll (best practice)
+  # - gif        # only if you have a gif/ folder with assets
