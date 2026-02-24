@@ -1,8 +1,7 @@
 # Quarto / build
 .quarto/
 _site/
-docs/
-eastern_scheldt_files/
+docs/site_libs/
 
 # Generated output (re-run notebooks to regenerate)
 output/
@@ -31,3 +30,5 @@ env/
 
 # Optional: uncomment to keep built site in repo (e.g. for GitHub Pages without CI)
 # !docs/
+
+/.quarto/
