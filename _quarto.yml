@@ -1,10 +1,13 @@
 project:
+  title: Barrier Book
   type: website
-  output-dir: docs
   render:
     - index.qmd
     - cloures.qmd
     - storm.qmd
+  output-dir: docs
+  lib-dir: site_libs
+
 
 website:
   navbar:
@@ -15,9 +18,3 @@ website:
         text: Closures
       - href: storm.qmd
         text: Storm Analysis
-
-resources:
-  - output
-  - styles.css
-  - .nojekyll   # copied to docs/ so GitHub Pages skips Jekyll (best practice)
-  # - gif        # only if you have a gif/ folder with assets
